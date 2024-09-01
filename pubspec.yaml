@@ -1,6 +1,6 @@
 name: bobs_jobs
 description: Functional programming with a pinch of salt.
-version: 0.0.1-dev.1
+version: 0.0.1-dev.2
 repository: https://github.com/JakesMD/dart-bobs-jobs
 
 environment:

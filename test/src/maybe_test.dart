@@ -46,8 +46,7 @@ void main() {
           Then: 'returns a new maybe with the new value',
         ),
         procedure(() {
-          final result =
-              bobsPresent(1).deriveOnBobsPresent((value) => value + 1);
+          final result = bobsPresent(1).deriveOnPresent((value) => value + 1);
 
           expect(result, bobsPresent(2));
         }),
@@ -61,7 +60,7 @@ void main() {
         ),
         procedure(() {
           final result =
-              BobsAbsent<int>().deriveOnBobsPresent((value) => value + 1);
+              BobsAbsent<int>().deriveOnPresent((value) => value + 1);
 
           expect(result, bobsAbsent());
         }),

@@ -20,7 +20,7 @@ sealed class BobsMaybe<T> {
   ///
   /// If the maybe is present, the value will be replaced with the result of
   /// [onPresent].
-  BobsMaybe<T2> deriveOnBobsPresent<T2>(T2 Function(T value) onPresent) {
+  BobsMaybe<T2> deriveOnPresent<T2>(T2 Function(T value) onPresent) {
     if (this is BobsPresent<T>) {
       return BobsPresent(onPresent((this as BobsPresent<T>).value));
     } else {
