@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 ///
 /// The [F] type represents the failure type.
 /// The [S] type represents the success type.
-sealed class Outcome<F, S> {
+sealed class BobsOutcome<F, S> {
   /// Evaluates the outcome of the job.
   ///
   /// If the job failed, the [onFailure] function is called with the failure
@@ -17,77 +17,87 @@ sealed class Outcome<F, S> {
     required T Function(F failure) onFailure,
     required T Function(S success) onSuccess,
   }) {
-    if (this is Success<F, S>) {
-      return onSuccess((this as Success<F, S>).value);
+    if (this is BobsSuccess<F, S>) {
+      return onSuccess((this as BobsSuccess<F, S>).value);
     } else {
-      return onFailure((this as Failure<F, S>).value);
+      return onFailure((this as BobsFailure<F, S>).value);
     }
   }
 }
 
-/// {@template Success}
+/// {@template BobsSuccess}
 ///
 /// Represents a successful outcome.
 ///
 /// {@endtemplate}
-final class Success<F, S> extends Outcome<F, S> {
-  /// {@macro Success}
-  Success(this.value);
+final class BobsSuccess<F, S> extends BobsOutcome<F, S> {
+  /// {@macro BobsSuccess}
+  BobsSuccess(this.value);
 
   /// The success value.
   final S value;
 
   @override
   bool operator ==(Object other) =>
-      other is Success<F, S> && other.value == value;
+      other is BobsSuccess<F, S> && other.value == value;
 
   @override
   int get hashCode => Object.hash(runtimeType, value);
 }
 
-/// {@template Failure}
+/// {@template BobsFailure}
 ///
 /// Represents a failed outcome.
 ///
 /// {@endtemplate}
-final class Failure<F, S> extends Outcome<F, S> {
-  /// {@macro Failure}
-  Failure(this.value);
+final class BobsFailure<F, S> extends BobsOutcome<F, S> {
+  /// {@macro BobsFailure}
+  BobsFailure(this.value);
 
   /// The failure value.
   final F value;
 
   @override
   bool operator ==(Object other) =>
-      other is Failure<F, S> && other.value == value;
+      other is BobsFailure<F, S> && other.value == value;
 
   @override
   int get hashCode => Object.hash(runtimeType, value);
 }
 
 /// Creates a successful outcome.
-Outcome<F, S> success<F, S>(S value) => Success<F, S>(value);
+BobsOutcome<F, S> bobsSuccess<F, S>(S value) => BobsSuccess<F, S>(value);
 
 /// Creates a failed outcome.
-Outcome<F, S> failure<F, S>(F value) => Failure<F, S>(value);
+BobsOutcome<F, S> bobsFailure<F, S>(F value) => BobsFailure<F, S>(value);
 
 /// Expects the [actual] outcome to be equal to the [expected] successful
 /// outcome.
-void expectSuccess<F, S>(
-  Outcome<F, S> actual,
+void bobsExpectSuccess<F, S>(
+  BobsOutcome<F, S> actual,
   S expected, {
   String? reason,
   dynamic skip,
 }) {
-  return expect(actual, Success<F, S>(expected), reason: reason, skip: skip);
+  return expect(
+    actual,
+    BobsSuccess<F, S>(expected),
+    reason: reason,
+    skip: skip,
+  );
 }
 
 /// Expects the [actual] outcome to be equal to the [expected] failed outcome.
-void expectFailure<F, S>(
-  Outcome<F, S> actual,
+void bobsExpectFailure<F, S>(
+  BobsOutcome<F, S> actual,
   F expected, {
   String? reason,
   dynamic skip,
 }) {
-  return expect(actual, Failure<F, S>(expected), reason: reason, skip: skip);
+  return expect(
+    actual,
+    BobsFailure<F, S>(expected),
+    reason: reason,
+    skip: skip,
+  );
 }

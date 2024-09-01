@@ -1,9 +1,9 @@
-import 'package:jobs/jobs.dart';
+import 'package:bobs_jobs/bobs_jobs.dart';
 import 'package:test/test.dart';
 import 'package:test_beautifier/test_beautifier.dart';
 
 void main() {
-  group('Outcome tests', () {
+  group('BobsOutcome tests', () {
     group('evaluate', () {
       test(
         requirement(
@@ -12,7 +12,7 @@ void main() {
           Then: 'the success function is called',
         ),
         procedure(() {
-          final result = success(1).evaluate(
+          final result = bobsSuccess(1).evaluate(
             onFailure: (_) => fail('Should not be called'),
             onSuccess: (value) => value,
           );
@@ -28,7 +28,7 @@ void main() {
           Then: 'the failure function is called',
         ),
         procedure(() {
-          final result = failure('error').evaluate(
+          final result = bobsFailure('error').evaluate(
             onFailure: (error) => error,
             onSuccess: (_) => fail('Should not be called'),
           );
@@ -38,7 +38,7 @@ void main() {
       );
     });
 
-    group('Success', () {
+    group('BobsSuccess', () {
       test(
         requirement(
           Given: 'a value',
@@ -46,9 +46,9 @@ void main() {
           Then: 'the value is stored',
         ),
         procedure(() {
-          final outcome = success(1);
+          final outcome = bobsSuccess(1);
 
-          expect((outcome as Success).value, 1);
+          expect((outcome as BobsSuccess).value, 1);
         }),
       );
 
@@ -59,12 +59,12 @@ void main() {
           Then: 'does not throw an exception',
         ),
         procedure(() {
-          expect(success(1).hashCode, isA<int>());
+          expect(bobsSuccess(1).hashCode, isA<int>());
         }),
       );
     });
 
-    group('Failure', () {
+    group('BobsFailure', () {
       test(
         requirement(
           Given: 'an error',
@@ -72,9 +72,9 @@ void main() {
           Then: 'the error is stored',
         ),
         procedure(() {
-          final outcome = failure('error');
+          final outcome = bobsFailure('error');
 
-          expect((outcome as Failure).value, 'error');
+          expect((outcome as BobsFailure).value, 'error');
         }),
       );
 
@@ -85,7 +85,7 @@ void main() {
           Then: 'does not throw an exception',
         ),
         procedure(() {
-          expect(failure(1).hashCode, isA<int>());
+          expect(bobsFailure(1).hashCode, isA<int>());
         }),
       );
     });

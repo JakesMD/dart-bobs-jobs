@@ -1,21 +1,21 @@
 import 'dart:async';
 
-import 'package:jobs/jobs.dart';
+import 'package:bobs_jobs/bobs_jobs.dart';
 
-/// {@template Job}
+/// {@template BobsJob}
 ///
 /// Represents a job that can either succeed or fail.
-/// A job is a function that returns a [Outcome].
+/// A job is a function that returns a [BobsOutcome].
 ///
 /// `F`: The type of the failure value.
 ///
 /// `S`: The type of the success value.
 ///
 /// {@endtemplate}
-class Job<F, S> {
-  /// {@macro Job}
-  const Job({
-    required FutureOr<Outcome<F, S>> Function() run,
+class BobsJob<F, S> {
+  /// {@macro BobsJob}
+  const BobsJob({
+    required FutureOr<BobsOutcome<F, S>> Function() run,
     this.isAsync = false,
   }) : _job = run;
 
@@ -27,24 +27,24 @@ class Job<F, S> {
   /// error.
   ///
   /// `isAsync`:
-  /// {@macro jobs.Job.isAsync}
-  factory Job.attempt({
+  /// {@macro bobs_jobs.BobsJob.isAsync}
+  factory BobsJob.attempt({
     required FutureOr<S> Function() run,
     required F Function(Object error) onError,
     bool isAsync = true,
   }) =>
-      Job<F, S>(
+      BobsJob<F, S>(
         isAsync: isAsync,
         run: () async {
           try {
-            return Success<F, S>(await run());
+            return BobsSuccess<F, S>(await run());
           } catch (error) {
-            return Failure<F, S>(onError(error));
+            return BobsFailure<F, S>(onError(error));
           }
         },
       );
 
-  /// {@template jobs.Job.isAsync}
+  /// {@template bobs_jobs.BobsJob.isAsync}
   ///
   /// Whether the job is asynchronous. If true and `isDebugMode` is true, the
   /// job will be delayed by`delayDuration`.
@@ -52,7 +52,7 @@ class Job<F, S> {
   /// {@endtemplate}
   final bool isAsync;
 
-  final FutureOr<Outcome<F, S>> Function() _job;
+  final FutureOr<BobsOutcome<F, S>> Function() _job;
 
   /// Chains a job with another job if the first job succeeds.
   ///
@@ -60,18 +60,18 @@ class Job<F, S> {
   /// the first job.
   ///
   /// `isAsync`:
-  /// {@macro jobs.Job.isAsync}
-  Job<F, S2> then<S2>({
+  /// {@macro bobs_jobs.BobsJob.isAsync}
+  BobsJob<F, S2> then<S2>({
     required FutureOr<S2> Function(S) run,
     bool isAsync = false,
   }) =>
-      Job(
+      BobsJob(
         isAsync: isAsync,
         run: () async {
           final result = await this.run();
           return result.evaluate(
-            onFailure: Failure<F, S2>.new,
-            onSuccess: (success) async => Success(await run(success)),
+            onFailure: BobsFailure<F, S2>.new,
+            onSuccess: (success) async => BobsSuccess(await run(success)),
           );
         },
       );
@@ -85,19 +85,19 @@ class Job<F, S> {
   /// error.
   ///
   /// `isAsync`:
-  /// {@macro jobs.Job.isAsync}
-  Job<F, S2> thenAttempt<S2>({
+  /// {@macro bobs_jobs.BobsJob.isAsync}
+  BobsJob<F, S2> thenAttempt<S2>({
     required FutureOr<S2> Function(S) run,
     required F Function(Object error) onError,
     bool isAsync = true,
   }) =>
-      Job(
+      BobsJob(
         isAsync: isAsync,
         run: () async {
           final result = await this.run();
           return result.evaluate(
-            onFailure: Failure<F, S2>.new,
-            onSuccess: (success) => Job.attempt(
+            onFailure: BobsFailure<F, S2>.new,
+            onSuccess: (success) => BobsJob.attempt(
               run: () => run(success),
               onError: onError,
             ).run(),
@@ -106,27 +106,28 @@ class Job<F, S> {
       );
 
   /// Evaluates the outcome of the job.
-  Job<F2, S2> thenEvaluate<F2, S2>({
+  BobsJob<F2, S2> thenEvaluate<F2, S2>({
     required F2 Function(F error) onFailure,
     required S2 Function(S success) onSuccess,
   }) =>
-      Job(
+      BobsJob(
         run: () async {
           final result = await this.run();
           return result.evaluate(
-            onFailure: (failure) => Failure<F2, S2>(onFailure(failure)),
-            onSuccess: (success) => Success<F2, S2>(onSuccess(success)),
+            onFailure: (failure) => BobsFailure<F2, S2>(onFailure(failure)),
+            onSuccess: (success) => BobsSuccess<F2, S2>(onSuccess(success)),
           );
         },
       );
 
   /// Evaluates the outcome of the job but only in the case of a failure.
-  Job<F2, S> thenEvaluateOnFailure<F2>(F2 Function(F error) onFailure) => Job(
+  BobsJob<F2, S> thenEvaluateOnFailure<F2>(F2 Function(F error) onFailure) =>
+      BobsJob(
         run: () async {
           final result = await this.run();
           return result.evaluate(
-            onFailure: (failure) => Failure<F2, S>(onFailure(failure)),
-            onSuccess: Success<F2, S>.new,
+            onFailure: (failure) => BobsFailure<F2, S>(onFailure(failure)),
+            onSuccess: BobsSuccess<F2, S>.new,
           );
         },
       );
@@ -135,7 +136,7 @@ class Job<F, S> {
   ///
   /// If `isDebugMode` is true, the job will be delayed by `delayDuration` to
   /// simulate a real-world scenario.
-  FutureOr<Outcome<F, S>> run({
+  FutureOr<BobsOutcome<F, S>> run({
     bool isDebugMode = false,
     Duration delayDuration = const Duration(milliseconds: 500),
   }) {
@@ -149,13 +150,13 @@ class Job<F, S> {
 /// Creates a fake job that always succeeds with the given value.
 ///
 /// This is used for testing.
-Job<F, S> fakeSuccessJob<F, S>(S value) => Job<F, S>(
-      run: () async => Success<F, S>(value),
+BobsJob<F, S> bobsFakeSuccessJob<F, S>(S value) => BobsJob<F, S>(
+      run: () async => BobsSuccess<F, S>(value),
     );
 
 /// Creates a fake job that always fails with the given value.
 ///
 /// This is used for testing.
-Job<F, S> fakeFailureJob<F, S>(F value) => Job<F, S>(
-      run: () async => Failure<F, S>(value),
+BobsJob<F, S> bobsFakeFailureJob<F, S>(F value) => BobsJob<F, S>(
+      run: () async => BobsFailure<F, S>(value),
     );

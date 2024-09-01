@@ -1,4 +1,4 @@
-name: jobs
+name: bobs_jobs
 description: Functional programming with a pinch of salt.
 version: 0.0.1-dev.1
 repository: https://github.com/JakesMD/dart-jobs

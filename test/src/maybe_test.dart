@@ -1,9 +1,9 @@
-import 'package:jobs/jobs.dart';
+import 'package:bobs_jobs/bobs_jobs.dart';
 import 'package:test/test.dart';
 import 'package:test_beautifier/test_beautifier.dart';
 
 void main() {
-  group('Maybe tests', () {
+  group('BobsMaybe tests', () {
     group('evaluate', () {
       test(
         requirement(
@@ -12,7 +12,7 @@ void main() {
           Then: 'the [onPresent] function is called',
         ),
         procedure(() {
-          final result = present(1).evaluate(
+          final result = bobsPresent(1).evaluate(
             onAbsent: () => fail('Should not be called'),
             onPresent: (value) => value,
           );
@@ -23,22 +23,22 @@ void main() {
 
       test(
         requirement(
-          Given: 'a absent value',
+          Given: 'an absent value',
           When: 'the maybe is evaluated',
           Then: 'the [onAbsent] function is called',
         ),
         procedure(() {
-          final result = Absent().evaluate(
-            onAbsent: () => 'absent',
+          final result = BobsAbsent().evaluate(
+            onAbsent: () => 'bobsAbsent',
             onPresent: (_) => fail('Should not be called'),
           );
 
-          expect(result, 'absent');
+          expect(result, 'bobsAbsent');
         }),
       );
     });
 
-    group('deriveOnPresent', () {
+    group('deriveOnBobsPresent', () {
       test(
         requirement(
           Given: 'a present value',
@@ -46,38 +46,40 @@ void main() {
           Then: 'returns a new maybe with the new value',
         ),
         procedure(() {
-          final result = present(1).deriveOnPresent((value) => value + 1);
+          final result =
+              bobsPresent(1).deriveOnBobsPresent((value) => value + 1);
 
-          expect(result, present(2));
+          expect(result, bobsPresent(2));
         }),
       );
 
       test(
         requirement(
-          Given: 'a absent value',
+          Given: 'an absent value',
           When: 'the maybe is derived',
           Then: 'returns an absent maybe',
         ),
         procedure(() {
-          final result = Absent<int>().deriveOnPresent((value) => value + 1);
+          final result =
+              BobsAbsent<int>().deriveOnBobsPresent((value) => value + 1);
 
-          expect(result, absent());
+          expect(result, bobsAbsent());
         }),
       );
     });
 
-    group('present', () {
+    group('bobsPresent', () {
       test(
         requirement(
           Given: 'a present value',
           When: 'a present is created',
-          Then: 'returns a [Present] instance with the value',
+          Then: 'returns a [BobsPresent] instance with the value',
         ),
         procedure(() {
-          final p = present(1);
+          final p = bobsPresent(1);
 
-          expect(p, Present(1));
-          expect((p as Present).value, 1);
+          expect(p, BobsPresent(1));
+          expect((p as BobsPresent).value, 1);
         }),
       );
 
@@ -88,21 +90,21 @@ void main() {
           Then: 'does not fail',
         ),
         procedure(() {
-          expect(present(1).hashCode, isA<int>());
+          expect(bobsPresent(1).hashCode, isA<int>());
         }),
       );
     });
 
-    group('absent', () {
+    group('bobsAbsent', () {
       test(
         requirement(
           When: 'an absent is created',
-          Then: 'returns a [Absent] instance',
+          Then: 'returns a [BobsAbsent] instance',
         ),
         procedure(() {
-          final a = absent<int>();
+          final a = bobsAbsent<int>();
 
-          expect(a, isA<Absent<int>>());
+          expect(a, isA<BobsAbsent<int>>());
         }),
       );
 
@@ -113,11 +115,11 @@ void main() {
           Then: 'both are equal',
         ),
         procedure(() {
-          late Maybe<int> maybe;
+          late BobsMaybe<int> maybe;
 
-          maybe = absent<int>();
+          maybe = bobsAbsent<int>();
 
-          expect(maybe, absent());
+          expect(maybe, bobsAbsent());
         }),
       );
 
@@ -128,7 +130,7 @@ void main() {
           Then: 'does not fail',
         ),
         procedure(() {
-          expect(absent().hashCode, isA<int>());
+          expect(bobsAbsent().hashCode, isA<int>());
         }),
       );
     });

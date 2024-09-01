@@ -1,9 +1,9 @@
-import 'package:jobs/jobs.dart';
+import 'package:bobs_jobs/bobs_jobs.dart';
 import 'package:test/test.dart';
 import 'package:test_beautifier/test_beautifier.dart';
 
 void main() {
-  group('Job tests', () {
+  group('BobsJob tests', () {
     group('run', () {
       test(
         requirement(
@@ -12,11 +12,11 @@ void main() {
           Then: 'returns a success',
         ),
         procedure(() async {
-          final job = Job(run: () => Success(1));
+          final job = BobsJob(run: () => BobsSuccess(1));
 
           final result = await job.run();
 
-          expectSuccess(result, 1);
+          bobsExpectSuccess(result, 1);
         }),
       );
 
@@ -27,11 +27,11 @@ void main() {
           Then: 'returns a failure',
         ),
         procedure(() async {
-          final job = Job(run: () => Failure('error'));
+          final job = BobsJob(run: () => BobsFailure('error'));
 
           final result = await job.run();
 
-          expectFailure(result, 'error');
+          bobsExpectFailure(result, 'error');
         }),
       );
 
@@ -42,8 +42,8 @@ void main() {
           Then: 'outcome is delayed',
         ),
         procedure(() async {
-          final job = Job(
-            run: () => Success(1),
+          final job = BobsJob(
+            run: () => BobsSuccess(1),
             isAsync: true,
           );
 
@@ -72,14 +72,14 @@ void main() {
           Then: 'returns a success',
         ),
         procedure(() async {
-          final job = Job.attempt(
+          final job = BobsJob.attempt(
             run: () => 1,
             onError: (error) => 'error',
           );
 
           final result = await job.run();
 
-          expectSuccess(result, 1);
+          bobsExpectSuccess(result, 1);
         }),
       );
 
@@ -90,14 +90,14 @@ void main() {
           Then: 'returns a failure',
         ),
         procedure(() async {
-          final job = Job.attempt(
+          final job = BobsJob.attempt(
             run: () => throw Exception(),
             onError: (error) => 'error',
           );
 
           final result = await job.run();
 
-          expectFailure(result, 'error');
+          bobsExpectFailure(result, 'error');
         }),
       );
     });
@@ -110,14 +110,14 @@ void main() {
           Then: 'returns second success',
         ),
         procedure(() async {
-          final job = Job.attempt(
+          final job = BobsJob.attempt(
             run: () => 1,
             onError: (error) => 'error1',
           ).then(run: (value) => value + 1);
 
           final result = await job.run();
 
-          expectSuccess(result, 2);
+          bobsExpectSuccess(result, 2);
         }),
       );
 
@@ -128,14 +128,14 @@ void main() {
           Then: 'returns the failure',
         ),
         procedure(() async {
-          final job = Job.attempt(
+          final job = BobsJob.attempt(
             run: () => throw Exception(),
             onError: (error) => 'error1',
           ).then(run: (value) => value);
 
           final result = await job.run();
 
-          expectFailure(result, 'error1');
+          bobsExpectFailure(result, 'error1');
         }),
       );
     });
@@ -148,7 +148,7 @@ void main() {
           Then: 'returns second success',
         ),
         procedure(() async {
-          final job = Job.attempt(
+          final job = BobsJob.attempt(
             run: () => 1,
             onError: (error) => 'error1',
           ).thenAttempt(
@@ -158,7 +158,7 @@ void main() {
 
           final result = await job.run();
 
-          expectSuccess(result, 2);
+          bobsExpectSuccess(result, 2);
         }),
       );
 
@@ -169,7 +169,7 @@ void main() {
           Then: 'returns the second failure',
         ),
         procedure(() async {
-          final job = Job.attempt(
+          final job = BobsJob.attempt(
             run: () => 1,
             onError: (error) => 'error1',
           ).thenAttempt(
@@ -179,7 +179,7 @@ void main() {
 
           final result = await job.run();
 
-          expectFailure(result, 'error2');
+          bobsExpectFailure(result, 'error2');
         }),
       );
 
@@ -190,7 +190,7 @@ void main() {
           Then: 'returns the first failure',
         ),
         procedure(() async {
-          final job = Job.attempt(
+          final job = BobsJob.attempt(
             run: () => throw Exception(),
             onError: (error) => 'error1',
           ).thenAttempt(
@@ -200,7 +200,7 @@ void main() {
 
           final result = await job.run();
 
-          expectFailure(result, 'error1');
+          bobsExpectFailure(result, 'error1');
         }),
       );
 
@@ -211,7 +211,7 @@ void main() {
           Then: 'returns the first failure',
         ),
         procedure(() async {
-          final job = Job.attempt(
+          final job = BobsJob.attempt(
             run: () => throw Exception(),
             onError: (error) => 'error1',
           ).thenAttempt(
@@ -221,7 +221,7 @@ void main() {
 
           final result = await job.run();
 
-          expectFailure(result, 'error1');
+          bobsExpectFailure(result, 'error1');
         }),
       );
     });
@@ -234,14 +234,15 @@ void main() {
           Then: 'returns the second success',
         ),
         procedure(() async {
-          final job = Job.attempt(run: () => 1, onError: (error) => 'error1')
-              .thenEvaluate(
+          final job =
+              BobsJob.attempt(run: () => 1, onError: (error) => 'error1')
+                  .thenEvaluate(
             onFailure: (error) => fail('Should not be called'),
             onSuccess: (value) => 2,
           );
 
           final result = await job.run();
-          expectSuccess(result, 2);
+          bobsExpectSuccess(result, 2);
         }),
       );
 
@@ -252,7 +253,7 @@ void main() {
           Then: 'returns the second failure',
         ),
         procedure(() async {
-          final job = Job.attempt(
+          final job = BobsJob.attempt(
             run: () => throw Exception(),
             onError: (error) => 'error1',
           ).thenEvaluate(
@@ -262,7 +263,7 @@ void main() {
 
           final result = await job.run();
 
-          expectFailure(result, 'error2');
+          bobsExpectFailure(result, 'error2');
         }),
       );
     });
@@ -275,14 +276,14 @@ void main() {
           Then: 'returns the first success',
         ),
         procedure(() async {
-          final job = Job.attempt(
+          final job = BobsJob.attempt(
             run: () => 1,
             onError: (error) => 'error1',
           ).thenEvaluateOnFailure((error) => fail('Should not be called'));
 
           final result = await job.run();
 
-          expectSuccess(result, 1);
+          bobsExpectSuccess(result, 1);
         }),
       );
 
@@ -293,19 +294,19 @@ void main() {
           Then: 'returns the second failure',
         ),
         procedure(() async {
-          final job = Job.attempt(
+          final job = BobsJob.attempt(
             run: () => throw Exception(),
             onError: (error) => 'error1',
           ).thenEvaluateOnFailure((error) => 'error2');
 
           final result = await job.run();
 
-          expectFailure(result, 'error2');
+          bobsExpectFailure(result, 'error2');
         }),
       );
     });
 
-    group('fakeSuccessJob', () {
+    group('bobsFakeSuccessJob', () {
       test(
         requirement(
           Given: 'a fake success job',
@@ -313,16 +314,16 @@ void main() {
           Then: 'returns the success',
         ),
         procedure(() async {
-          final job = fakeSuccessJob(1);
+          final job = bobsFakeSuccessJob(1);
 
           final result = await job.run();
 
-          expectSuccess(result, 1);
+          bobsExpectSuccess(result, 1);
         }),
       );
     });
 
-    group('fakeFailureJob', () {
+    group('bobsFakeFailureJob', () {
       test(
         requirement(
           Given: 'a fake failure job',
@@ -330,11 +331,11 @@ void main() {
           Then: 'returns the failure',
         ),
         procedure(() async {
-          final job = fakeFailureJob(1);
+          final job = bobsFakeFailureJob(1);
 
           final result = await job.run();
 
-          expectFailure(result, 1);
+          bobsExpectFailure(result, 1);
         }),
       );
     });

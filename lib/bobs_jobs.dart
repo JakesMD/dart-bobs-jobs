@@ -1,5 +1,5 @@
 /// Functional programming with a pinch of salt.
-library jobs;
+library bobs_jobs;
 
 export 'src/job.dart';
 export 'src/maybe.dart';
