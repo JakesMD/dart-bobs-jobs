@@ -44,13 +44,13 @@ void main() {
         procedure(() async {
           final job = BobsJob(
             run: () => BobsSuccess(1),
+            delayDuration: const Duration(milliseconds: 50),
             isAsync: true,
           );
 
           final startTime = DateTime.now();
 
           await job.run(
-            delayDuration: const Duration(milliseconds: 5),
             isDebugMode: true,
           );
 
@@ -58,7 +58,39 @@ void main() {
 
           expect(
             endTime.difference(startTime).inMilliseconds,
-            greaterThan(5),
+            greaterThan(49),
+          );
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'chained async jobs and debug mode is enabled',
+          When: 'the job is run',
+          Then: 'outcome is delayed',
+        ),
+        procedure(() async {
+          final job = BobsJob(
+            run: () => BobsSuccess(1),
+            delayDuration: const Duration(milliseconds: 25),
+            isAsync: true,
+          ).then(
+            run: (value) => BobsSuccess(value + 1),
+            isAsync: true,
+            delayDuration: const Duration(milliseconds: 25),
+          );
+
+          final startTime = DateTime.now();
+
+          await job.run(
+            isDebugMode: true,
+          );
+
+          final endTime = DateTime.now();
+
+          expect(
+            endTime.difference(startTime).inMilliseconds,
+            greaterThan(49),
           );
         }),
       );
@@ -74,7 +106,7 @@ void main() {
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => 1,
-            onError: (error) => 'error',
+            onError: (error, s) => 'error',
           );
 
           final result = await job.run();
@@ -92,7 +124,7 @@ void main() {
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => throw Exception(),
-            onError: (error) => 'error',
+            onError: (error, s) => 'error',
           );
 
           final result = await job.run();
@@ -112,7 +144,7 @@ void main() {
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => 1,
-            onError: (error) => 'error1',
+            onError: (error, s) => 'error1',
           ).then(run: (value) => value + 1);
 
           final result = await job.run();
@@ -130,7 +162,7 @@ void main() {
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => throw Exception(),
-            onError: (error) => 'error1',
+            onError: (error, s) => 'error1',
           ).then(run: (value) => value);
 
           final result = await job.run();
@@ -150,10 +182,10 @@ void main() {
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => 1,
-            onError: (error) => 'error1',
+            onError: (error, s) => 'error1',
           ).thenAttempt(
             run: (value) => value + 1,
-            onError: (error) => 'error2',
+            onError: (error, stack) => 'error2',
           );
 
           final result = await job.run();
@@ -171,10 +203,10 @@ void main() {
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => 1,
-            onError: (error) => 'error1',
+            onError: (error, s) => 'error1',
           ).thenAttempt(
             run: (value) => throw Exception(),
-            onError: (error) => 'error2',
+            onError: (error, stack) => 'error2',
           );
 
           final result = await job.run();
@@ -192,10 +224,10 @@ void main() {
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => throw Exception(),
-            onError: (error) => 'error1',
+            onError: (error, s) => 'error1',
           ).thenAttempt(
             run: (value) => 1,
-            onError: (error) => 'error2',
+            onError: (error, stack) => 'error2',
           );
 
           final result = await job.run();
@@ -213,10 +245,10 @@ void main() {
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => throw Exception(),
-            onError: (error) => 'error1',
+            onError: (error, s) => 'error1',
           ).thenAttempt(
             run: (value) => throw Exception(),
-            onError: (error) => 'error2',
+            onError: (error, stack) => 'error2',
           );
 
           final result = await job.run();
@@ -235,7 +267,7 @@ void main() {
         ),
         procedure(() async {
           final job =
-              BobsJob.attempt(run: () => 1, onError: (error) => 'error1')
+              BobsJob.attempt(run: () => 1, onError: (error, s) => 'error1')
                   .thenEvaluate(
             onFailure: (error) => fail('Should not be called'),
             onSuccess: (value) => 2,
@@ -255,7 +287,7 @@ void main() {
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => throw Exception(),
-            onError: (error) => 'error1',
+            onError: (error, s) => 'error1',
           ).thenEvaluate(
             onFailure: (error) => 'error2',
             onSuccess: (value) => fail('Should not be called'),
@@ -278,7 +310,7 @@ void main() {
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => 1,
-            onError: (error) => 'error1',
+            onError: (error, s) => 'error1',
           ).thenEvaluateOnFailure((error) => fail('Should not be called'));
 
           final result = await job.run();
@@ -296,7 +328,7 @@ void main() {
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => throw Exception(),
-            onError: (error) => 'error1',
+            onError: (error, s) => 'error1',
           ).thenEvaluateOnFailure((error) => 'error2');
 
           final result = await job.run();
