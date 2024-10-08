@@ -338,6 +338,84 @@ void main() {
       );
     });
 
+    group('chainOnSuccess', () {
+      test(
+        requirement(
+          Given: 'a successful job',
+          When: 'the job is chained with another successful job',
+          Then: 'returns the second success',
+        ),
+        procedure(() async {
+          final job1 = BobsJob.attempt(
+            run: () => 1,
+            onError: (error, s) => -1,
+          );
+          final job2 = BobsJob.attempt(
+            run: () => '2',
+            onError: (error, s) => '-2',
+          );
+
+          final combinedJob = job1.chainOnSuccess<String, String>(
+            nextJob: (s) => job2,
+            onFailure: (f) => fail('Should not be called'),
+          );
+
+          final result = await combinedJob.run();
+
+          bobsExpectSuccess(result, '2');
+        }),
+      );
+      test(
+        requirement(
+          Given: 'a successful job',
+          When: 'the job is chained with a failing job',
+          Then: 'returns the second failure',
+        ),
+        procedure(() async {
+          final job1 = BobsJob.attempt(
+            run: () => 1,
+            onError: (error, s) => -1,
+          );
+          final job2 = BobsJob.attempt(
+            run: () => throw Exception(),
+            onError: (error, s) => '-2',
+          );
+
+          final combinedJob = job1.chainOnSuccess<String, String>(
+            nextJob: (s) => job2,
+            onFailure: (f) => fail('Should not be called'),
+          );
+
+          final result = await combinedJob.run();
+
+          bobsExpectFailure(result, '-2');
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'a failing job',
+          When: 'the job is chained with another job',
+          Then: 'returns the [onFailure] result',
+        ),
+        procedure(() async {
+          final job1 = BobsJob.attempt(
+            run: () => throw Exception(),
+            onError: (error, s) => -1,
+          );
+
+          final combinedJob = job1.chainOnSuccess<String, String>(
+            nextJob: (s) => fail('Should not be called'),
+            onFailure: (f) => f.toString(),
+          );
+
+          final result = await combinedJob.run();
+
+          bobsExpectFailure(result, '-1');
+        }),
+      );
+    });
+
     group('bobsFakeSuccessJob', () {
       test(
         requirement(

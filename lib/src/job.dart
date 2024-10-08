@@ -72,7 +72,7 @@ class BobsJob<F, S> {
 
   final FutureOr<BobsOutcome<F, S>> Function(bool isDebugMode)? _debugJob;
 
-  /// Chains a job with another job if the first job succeeds.
+  /// Runs another function if the first job succeeds.
   ///
   /// `run`: The function to run with the successful outcome of
   /// the first job.
@@ -96,7 +96,7 @@ class BobsJob<F, S> {
         },
       );
 
-  /// Chains the job with another job if the first job succeeds.
+  /// Runs another function if the first job succeeds.
   ///
   /// `run`: The function to run with the successful outcome of
   /// the first job.
@@ -151,6 +151,29 @@ class BobsJob<F, S> {
             onFailure: (failure) => BobsFailure<F2, S>(onFailure(failure)),
             onSuccess: BobsSuccess<F2, S>.new,
           );
+        },
+      );
+
+  /// Chains a job instance with another job instance if the first job succeeds.
+  ///
+  /// `onFailure`: Called when the first job fails. Its casts the failure value
+  /// of the first job to the new failure type.
+  ///
+  /// `nextJob`: The job to run with the success outcome of the first job.
+  BobsJob<F2, S2> chainOnSuccess<F2, S2>({
+    required F2 Function(F failure) onFailure,
+    required BobsJob<F2, S2> Function(S success) nextJob,
+  }) =>
+      BobsJob._(
+        run: (debug) async {
+          final result1 = await this.run(isDebugMode: debug);
+
+          if (result1 is BobsFailure<F, S>) {
+            return BobsFailure<F2, S2>(onFailure(result1.value));
+          }
+
+          return await nextJob((result1 as BobsSuccess<F, S>).value)
+              .run(isDebugMode: debug);
         },
       );
 
