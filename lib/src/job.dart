@@ -20,15 +20,7 @@ class BobsJob<F, S> {
     required FutureOr<BobsOutcome<F, S>> Function() run,
     this.isAsync = false,
     this.delayDuration = const Duration(milliseconds: 500),
-  })  : _job = run,
-        _debugJob = null;
-
-  const BobsJob._({
-    required FutureOr<BobsOutcome<F, S>> Function(bool isDebugMode) run,
-    this.isAsync = false,
-    this.delayDuration = const Duration(milliseconds: 500),
-  })  : _debugJob = run,
-        _job = null;
+  }) : _job = run;
 
   /// Creates a new job that attempts to run the given function.
   ///
@@ -70,8 +62,6 @@ class BobsJob<F, S> {
 
   final FutureOr<BobsOutcome<F, S>> Function()? _job;
 
-  final FutureOr<BobsOutcome<F, S>> Function(bool isDebugMode)? _debugJob;
-
   /// Runs another function if the first job succeeds.
   ///
   /// `run`: The function to run with the successful outcome of
@@ -84,11 +74,11 @@ class BobsJob<F, S> {
     bool isAsync = false,
     Duration delayDuration = const Duration(milliseconds: 500),
   }) =>
-      BobsJob._(
+      BobsJob(
         isAsync: isAsync,
         delayDuration: delayDuration,
-        run: (debug) async {
-          final result = await this.run(isDebugMode: debug);
+        run: () async {
+          final result = await this.run();
           return result.evaluate(
             onFailure: BobsFailure<F, S2>.new,
             onSuccess: (success) async => BobsSuccess(await run(success)),
@@ -112,11 +102,11 @@ class BobsJob<F, S> {
     bool isAsync = true,
     Duration delayDuration = const Duration(milliseconds: 500),
   }) =>
-      BobsJob._(
+      BobsJob(
         isAsync: isAsync,
         delayDuration: delayDuration,
-        run: (debug) async {
-          final result = await this.run(isDebugMode: debug);
+        run: () async {
+          final result = await this.run();
           return result.evaluate(
             onFailure: BobsFailure<F, S2>.new,
             onSuccess: (success) => BobsJob.attempt(
@@ -132,9 +122,9 @@ class BobsJob<F, S> {
     required F2 Function(F error) onFailure,
     required S2 Function(S success) onSuccess,
   }) =>
-      BobsJob._(
-        run: (debug) async {
-          final result = await this.run(isDebugMode: debug);
+      BobsJob(
+        run: () async {
+          final result = await this.run();
           return result.evaluate(
             onFailure: (failure) => BobsFailure<F2, S2>(onFailure(failure)),
             onSuccess: (success) => BobsSuccess<F2, S2>(onSuccess(success)),
@@ -144,9 +134,9 @@ class BobsJob<F, S> {
 
   /// Evaluates the outcome of the job but only in the case of a failure.
   BobsJob<F2, S> thenEvaluateOnFailure<F2>(F2 Function(F error) onFailure) =>
-      BobsJob._(
-        run: (debug) async {
-          final result = await this.run(isDebugMode: debug);
+      BobsJob(
+        run: () async {
+          final result = await this.run();
           return result.evaluate(
             onFailure: (failure) => BobsFailure<F2, S>(onFailure(failure)),
             onSuccess: BobsSuccess<F2, S>.new,
@@ -164,16 +154,15 @@ class BobsJob<F, S> {
     required F2 Function(F failure) onFailure,
     required BobsJob<F2, S2> Function(S success) nextJob,
   }) =>
-      BobsJob._(
-        run: (debug) async {
-          final result1 = await this.run(isDebugMode: debug);
+      BobsJob(
+        run: () async {
+          final result1 = await this.run();
 
           if (result1 is BobsFailure<F, S>) {
             return BobsFailure<F2, S2>(onFailure(result1.value));
           }
 
-          return await nextJob((result1 as BobsSuccess<F, S>).value)
-              .run(isDebugMode: debug);
+          return await nextJob((result1 as BobsSuccess<F, S>).value).run();
         },
       );
 
@@ -181,13 +170,8 @@ class BobsJob<F, S> {
   ///
   /// If `isDebugMode` is true, the job will be delayed by `delayDuration` to
   /// simulate a real-world scenario.
-  FutureOr<BobsOutcome<F, S>> run({bool isDebugMode = false}) {
-    if (isAsync && isDebugMode) {
-      return Future.delayed(delayDuration).then(
-        (_) => _debugJob?.call(true) ?? _job!.call(),
-      );
-    }
-    return _debugJob?.call(false) ?? _job!.call();
+  FutureOr<BobsOutcome<F, S>> run() {
+    return _job!.call();
   }
 }
 

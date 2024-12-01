@@ -34,66 +34,6 @@ void main() {
           bobsExpectFailure(result, 'error');
         }),
       );
-
-      test(
-        requirement(
-          Given: 'an async job and debug mode is enabled',
-          When: 'the job is run',
-          Then: 'outcome is delayed',
-        ),
-        procedure(() async {
-          final job = BobsJob(
-            run: () => BobsSuccess(1),
-            delayDuration: const Duration(milliseconds: 50),
-            isAsync: true,
-          );
-
-          final startTime = DateTime.now();
-
-          await job.run(
-            isDebugMode: true,
-          );
-
-          final endTime = DateTime.now();
-
-          expect(
-            endTime.difference(startTime).inMilliseconds,
-            greaterThan(49),
-          );
-        }),
-      );
-
-      test(
-        requirement(
-          Given: 'chained async jobs and debug mode is enabled',
-          When: 'the job is run',
-          Then: 'outcome is delayed',
-        ),
-        procedure(() async {
-          final job = BobsJob(
-            run: () => BobsSuccess(1),
-            delayDuration: const Duration(milliseconds: 25),
-            isAsync: true,
-          ).then(
-            run: (value) => BobsSuccess(value + 1),
-            isAsync: true,
-            delayDuration: const Duration(milliseconds: 25),
-          );
-
-          final startTime = DateTime.now();
-
-          await job.run(
-            isDebugMode: true,
-          );
-
-          final endTime = DateTime.now();
-
-          expect(
-            endTime.difference(startTime).inMilliseconds,
-            greaterThan(49),
-          );
-        }),
-      );
     });
 
     group('attempt', () {
