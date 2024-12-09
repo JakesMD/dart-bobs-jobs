@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.1-dev.6
+- ✨ Add ability to only evaluate on a successful job
+
 ## 0.0.1-dev.5
 - 🔥 Remove debug delay
 

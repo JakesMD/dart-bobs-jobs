@@ -132,6 +132,18 @@ class BobsJob<F, S> {
         },
       );
 
+  /// Evaluates the outcome of the job but only in the case of a success.
+  BobsJob<F, S2> thenEvaluateOnSuccess<S2>(S2 Function(S success) onSuccess) =>
+      BobsJob(
+        run: () async {
+          final result = await this.run();
+          return result.evaluate(
+            onFailure: BobsFailure<F, S2>.new,
+            onSuccess: (success) => BobsSuccess<F, S2>(onSuccess(success)),
+          );
+        },
+      );
+
   /// Evaluates the outcome of the job but only in the case of a failure.
   BobsJob<F2, S> thenEvaluateOnFailure<F2>(F2 Function(F error) onFailure) =>
       BobsJob(

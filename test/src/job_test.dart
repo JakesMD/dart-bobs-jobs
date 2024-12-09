@@ -240,6 +240,44 @@ void main() {
       );
     });
 
+    group('thenEvaluateOnSuccess', () {
+      test(
+        requirement(
+          Given: 'a failing job',
+          When: 'the job is evaluated',
+          Then: 'returns the first failure',
+        ),
+        procedure(() async {
+          final job = BobsJob.attempt(
+            run: () => throw Exception(),
+            onError: (error, s) => 'error1',
+          ).thenEvaluateOnSuccess((success) => fail('Should not be called'));
+
+          final result = await job.run();
+
+          bobsExpectFailure(result, 'error1');
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'a successful job',
+          When: 'the job is evaluated',
+          Then: 'returns the second success',
+        ),
+        procedure(() async {
+          final job = BobsJob.attempt(
+            run: () => 1,
+            onError: (error, s) => 'error1',
+          ).thenEvaluateOnSuccess((success) => 2);
+
+          final result = await job.run();
+
+          bobsExpectSuccess(result, 2);
+        }),
+      );
+    });
+
     group('thenEvaluateOnFailure', () {
       test(
         requirement(
