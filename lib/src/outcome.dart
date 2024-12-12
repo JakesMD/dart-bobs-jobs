@@ -33,6 +33,12 @@ sealed class BobsOutcome<F, S> {
   ///
   /// Only call this if you are sure the job failed.
   F get asFailure => (this as BobsFailure<F, S>).value;
+
+  /// Returns `true` if the job succeeded.
+  bool get succeeded => this is BobsSuccess<F, S>;
+
+  /// Returns `true` if the job failed.
+  bool get failed => this is BobsFailure<F, S>;
 }
 
 /// {@template BobsSuccess}

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.1-dev.8
+- ✨ Add `succeeded` and `failed` checks to `BobsOutcome`
+
 ## 0.0.1-dev.7
 - ✨ Add ability to fetch the success or failure values of an outcome without evaluating it
 - 🔥 Remove `isAsync` and `delayDuration`

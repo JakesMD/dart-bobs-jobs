@@ -68,6 +68,62 @@ void main() {
       );
     });
 
+    group('succeeded', () {
+      test(
+        requirement(
+          Given: 'a successful outcome',
+          When: 'succeeded is called',
+          Then: 'returns true',
+        ),
+        procedure(() {
+          final result = bobsSuccess(1);
+
+          expect(result.succeeded, true);
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'a failed outcome',
+          When: 'succeeded is called',
+          Then: 'returns false',
+        ),
+        procedure(() {
+          final result = bobsFailure('error');
+
+          expect(result.succeeded, false);
+        }),
+      );
+    });
+
+    group('failed', () {
+      test(
+        requirement(
+          Given: 'a successful outcome',
+          When: 'failed is called',
+          Then: 'returns false',
+        ),
+        procedure(() {
+          final result = bobsSuccess(1);
+
+          expect(result.failed, false);
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'a failed outcome',
+          When: 'failed is called',
+          Then: 'returns true',
+        ),
+        procedure(() {
+          final result = bobsFailure('error');
+
+          expect(result.failed, true);
+        }),
+      );
+    });
+
     group('BobsSuccess', () {
       test(
         requirement(
