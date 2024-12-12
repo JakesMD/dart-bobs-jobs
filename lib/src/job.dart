@@ -16,11 +16,8 @@ import 'package:bobs_jobs/bobs_jobs.dart';
 /// {@endtemplate}
 class BobsJob<F, S> {
   /// {@macro BobsJob}
-  const BobsJob({
-    required FutureOr<BobsOutcome<F, S>> Function() run,
-    this.isAsync = false,
-    this.delayDuration = const Duration(milliseconds: 500),
-  }) : _job = run;
+  const BobsJob({required FutureOr<BobsOutcome<F, S>> Function() run})
+      : _job = run;
 
   /// Creates a new job that attempts to run the given function.
   ///
@@ -28,18 +25,11 @@ class BobsJob<F, S> {
   ///
   /// `onError`: The function called with the error if `run` throws an
   /// error.
-  ///
-  /// `isAsync`:
-  /// {@macro bobs_jobs.BobsJob.isAsync}
   factory BobsJob.attempt({
     required FutureOr<S> Function() run,
     required F Function(Object error, StackTrace stack) onError,
-    bool isAsync = true,
-    Duration delayDuration = const Duration(milliseconds: 500),
   }) =>
       BobsJob<F, S>(
-        isAsync: isAsync,
-        delayDuration: delayDuration,
         run: () async {
           try {
             return BobsSuccess<F, S>(await run());
@@ -49,34 +39,13 @@ class BobsJob<F, S> {
         },
       );
 
-  /// {@template bobs_jobs.BobsJob.isAsync}
-  ///
-  /// Whether the job is asynchronous. If true and `isDebugMode` is true, the
-  /// job will be delayed by`delayDuration`.
-  ///
-  /// {@endtemplate}
-  final bool isAsync;
-
-  /// The duration to delay the job if `isDebugMode` is true.
-  final Duration delayDuration;
-
   final FutureOr<BobsOutcome<F, S>> Function()? _job;
 
   /// Runs another function if the first job succeeds.
   ///
   /// `run`: The function to run with the successful outcome of
   /// the first job.
-  ///
-  /// `isAsync`:
-  /// {@macro bobs_jobs.BobsJob.isAsync}
-  BobsJob<F, S2> then<S2>({
-    required FutureOr<S2> Function(S) run,
-    bool isAsync = false,
-    Duration delayDuration = const Duration(milliseconds: 500),
-  }) =>
-      BobsJob(
-        isAsync: isAsync,
-        delayDuration: delayDuration,
+  BobsJob<F, S2> then<S2>({required FutureOr<S2> Function(S) run}) => BobsJob(
         run: () async {
           final result = await this.run();
           return result.evaluate(
@@ -93,18 +62,11 @@ class BobsJob<F, S> {
   ///
   /// `onError`: The function called with the error if `run` throws an
   /// error.
-  ///
-  /// `isAsync`:
-  /// {@macro bobs_jobs.BobsJob.isAsync}
   BobsJob<F, S2> thenAttempt<S2>({
     required FutureOr<S2> Function(S) run,
     required F Function(Object error, StackTrace stack) onError,
-    bool isAsync = true,
-    Duration delayDuration = const Duration(milliseconds: 500),
   }) =>
       BobsJob(
-        isAsync: isAsync,
-        delayDuration: delayDuration,
         run: () async {
           final result = await this.run();
           return result.evaluate(
@@ -179,12 +141,7 @@ class BobsJob<F, S> {
       );
 
   /// Runs the job.
-  ///
-  /// If `isDebugMode` is true, the job will be delayed by `delayDuration` to
-  /// simulate a real-world scenario.
-  FutureOr<BobsOutcome<F, S>> run() {
-    return _job!.call();
-  }
+  FutureOr<BobsOutcome<F, S>> run() => _job!.call();
 }
 
 /// Creates a fake job that always succeeds with the given value.

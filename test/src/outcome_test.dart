@@ -38,6 +38,36 @@ void main() {
       );
     });
 
+    group('asSuccess', () {
+      test(
+        requirement(
+          Given: 'a successful outcome',
+          When: 'asSuccess is called',
+          Then: 'the success value is returned',
+        ),
+        procedure(() {
+          final result = bobsSuccess(1);
+
+          expect(result.asSuccess, 1);
+        }),
+      );
+    });
+
+    group('asFailure', () {
+      test(
+        requirement(
+          Given: 'a failed outcome',
+          When: 'asFailure is called',
+          Then: 'the success value is returned',
+        ),
+        procedure(() {
+          final result = bobsFailure('error');
+
+          expect(result.asFailure, 'error');
+        }),
+      );
+    });
+
     group('BobsSuccess', () {
       test(
         requirement(

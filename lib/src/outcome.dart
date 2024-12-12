@@ -23,6 +23,16 @@ sealed class BobsOutcome<F, S> {
       return onFailure((this as BobsFailure<F, S>).value);
     }
   }
+
+  /// Returns the success value if the job succeeded.
+  ///
+  /// Only call this if you are sure the job succeeded.
+  S get asSuccess => (this as BobsSuccess<F, S>).value;
+
+  /// Returns the failure value if the job failed.
+  ///
+  /// Only call this if you are sure the job failed.
+  F get asFailure => (this as BobsFailure<F, S>).value;
 }
 
 /// {@template BobsSuccess}
