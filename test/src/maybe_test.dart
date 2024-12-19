@@ -67,6 +67,54 @@ void main() {
       );
     });
 
+    group('isPresent', () {
+      test(
+        requirement(
+          Given: 'a present value',
+          When: 'isPresent is called',
+          Then: 'returns true',
+        ),
+        procedure(() {
+          expect(bobsPresent(1).isPresent, isTrue);
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'an absent value',
+          When: 'isPresent is called',
+          Then: 'returns false',
+        ),
+        procedure(() {
+          expect(bobsAbsent().isPresent, isFalse);
+        }),
+      );
+    });
+
+    group('isAbsent', () {
+      test(
+        requirement(
+          Given: 'a present value',
+          When: 'isAbsent is called',
+          Then: 'returns false',
+        ),
+        procedure(() {
+          expect(bobsPresent(1).isAbsent, isFalse);
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'an absent value',
+          When: 'isAbsent is called',
+          Then: 'returns true',
+        ),
+        procedure(() {
+          expect(bobsAbsent().isAbsent, isTrue);
+        }),
+      );
+    });
+
     group('bobsPresent', () {
       test(
         requirement(

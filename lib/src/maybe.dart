@@ -27,6 +27,12 @@ sealed class BobsMaybe<T> {
       return bobsAbsent<T2>();
     }
   }
+
+  /// Returns 'true' if the value is present.
+  bool get isPresent => this is BobsPresent<T>;
+
+  /// Returns `true` if the value is absent.
+  bool get isAbsent => this is BobsAbsent<T>;
 }
 
 /// {@template BobsPresent}

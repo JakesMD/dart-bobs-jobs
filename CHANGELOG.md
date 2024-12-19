@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.1-dev.9
+- ✨ Add `isPresent` and `isAbsent` checks to `BobsMaybe`
+
 ## 0.0.1-dev.8
 - ✨ Add `succeeded` and `failed` checks to `BobsOutcome`
 
