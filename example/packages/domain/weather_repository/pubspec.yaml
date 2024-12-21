@@ -1,0 +1,17 @@
+name: weather_repository
+
+environment:
+  sdk: ">=3.6.0 <4.0.0"
+
+dependencies:
+  bobs_jobs:
+    path: ../../../../
+  equatable: ^2.0.7
+  open_meteo_client:
+    path: ../../data/open_meteo_client
+
+dev_dependencies:
+  mocktail: ^1.0.4
+  test: ^1.25.14
+  test_beautifier: ^1.1.0
+  very_good_analysis: ^7.0.0

@@ -1,0 +1,25 @@
+name: bobs_jobs_example
+
+environment:
+  sdk: ">=3.1.0 <4.0.0"
+
+dependencies:
+  bloc: ^8.1.4
+  bobs_jobs:
+    path: ../
+  equatable: ^2.0.7
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.6
+  google_fonts: ^6.2.1
+  weather_repository:
+    path: packages/domain/weather_repository
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+dev_dependencies:
+  bloc_test: ^9.1.7
+  mocktail: ^1.0.4
+  very_good_analysis: ^7.0.0
