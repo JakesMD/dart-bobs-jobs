@@ -4,15 +4,15 @@ import 'package:test_beautifier/test_beautifier.dart';
 
 void main() {
   group('BobsOutcome tests', () {
-    group('evaluate', () {
+    group('resolve', () {
       test(
         requirement(
           Given: 'a successful outcome',
-          When: 'the outcome is evaluated',
+          When: 'the outcome is resolved',
           Then: 'the success function is called',
         ),
         procedure(() {
-          final result = bobsSuccess(1).evaluate(
+          final result = bobsSuccess(1).resolve(
             onFailure: (_) => fail('Should not be called'),
             onSuccess: (value) => value,
           );
@@ -24,11 +24,11 @@ void main() {
       test(
         requirement(
           Given: 'a failed outcome',
-          When: 'the outcome is evaluated',
+          When: 'the outcome is resolved',
           Then: 'the failure function is called',
         ),
         procedure(() {
-          final result = bobsFailure('error').evaluate(
+          final result = bobsFailure('error').resolve(
             onFailure: (error) => error,
             onSuccess: (_) => fail('Should not be called'),
           );

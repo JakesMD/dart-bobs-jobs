@@ -7,13 +7,14 @@ import 'package:test/test.dart';
 /// The [F] type represents the failure type.
 /// The [S] type represents the success type.
 sealed class BobsOutcome<F, S> {
-  /// Evaluates the outcome of the job.
+  /// Resolves the outcome to a single type no matter if the job succeeded or
+  /// failed.
   ///
   /// If the job failed, the [onFailure] function is called with the failure
   /// value.
   /// If the job succeeded, the [onSuccess] function is called with the success
   /// value.
-  T evaluate<T>({
+  T resolve<T>({
     required T Function(F failure) onFailure,
     required T Function(S success) onSuccess,
   }) {
@@ -89,7 +90,7 @@ BobsOutcome<F, S> bobsFailure<F, S>(F value) => BobsFailure<F, S>(value);
 
 /// Expects the [actual] outcome to be equal to the [expected] successful
 /// outcome.
-void bobsExpectSuccess<F, S>(
+void expectBobsSuccess<F, S>(
   BobsOutcome<F, S> actual,
   S expected, {
   String? reason,
@@ -104,7 +105,7 @@ void bobsExpectSuccess<F, S>(
 }
 
 /// Expects the [actual] outcome to be equal to the [expected] failed outcome.
-void bobsExpectFailure<F, S>(
+void expectBobsFailure<F, S>(
   BobsOutcome<F, S> actual,
   F expected, {
   String? reason,

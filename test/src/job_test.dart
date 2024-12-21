@@ -16,7 +16,7 @@ void main() {
 
           final result = await job.run();
 
-          bobsExpectSuccess(result, 1);
+          expectBobsSuccess(result, 1);
         }),
       );
 
@@ -31,7 +31,7 @@ void main() {
 
           final result = await job.run();
 
-          bobsExpectFailure(result, 'error');
+          expectBobsFailure(result, 'error');
         }),
       );
     });
@@ -51,7 +51,7 @@ void main() {
 
           final result = await job.run();
 
-          bobsExpectSuccess(result, 1);
+          expectBobsSuccess(result, 1);
         }),
       );
 
@@ -69,7 +69,7 @@ void main() {
 
           final result = await job.run();
 
-          bobsExpectFailure(result, 'error');
+          expectBobsFailure(result, 'error');
         }),
       );
     });
@@ -89,7 +89,7 @@ void main() {
 
           final result = await job.run();
 
-          bobsExpectSuccess(result, 2);
+          expectBobsSuccess(result, 2);
         }),
       );
 
@@ -107,7 +107,7 @@ void main() {
 
           final result = await job.run();
 
-          bobsExpectFailure(result, 'error1');
+          expectBobsFailure(result, 'error1');
         }),
       );
     });
@@ -130,7 +130,7 @@ void main() {
 
           final result = await job.run();
 
-          bobsExpectSuccess(result, 2);
+          expectBobsSuccess(result, 2);
         }),
       );
 
@@ -151,7 +151,7 @@ void main() {
 
           final result = await job.run();
 
-          bobsExpectFailure(result, 'error2');
+          expectBobsFailure(result, 'error2');
         }),
       );
 
@@ -172,7 +172,7 @@ void main() {
 
           final result = await job.run();
 
-          bobsExpectFailure(result, 'error1');
+          expectBobsFailure(result, 'error1');
         }),
       );
 
@@ -193,125 +193,169 @@ void main() {
 
           final result = await job.run();
 
-          bobsExpectFailure(result, 'error1');
+          expectBobsFailure(result, 'error1');
         }),
       );
     });
 
-    group('thenEvaluate', () {
+    group('thenConvert', () {
       test(
         requirement(
           Given: 'a successful job',
-          When: 'the job is evaluated',
+          When: 'the job is converted',
           Then: 'returns the second success',
         ),
         procedure(() async {
           final job =
               BobsJob.attempt(run: () => 1, onError: (error, s) => 'error1')
-                  .thenEvaluate(
+                  .thenConvert(
             onFailure: (error) => fail('Should not be called'),
             onSuccess: (value) => 2,
           );
 
           final result = await job.run();
-          bobsExpectSuccess(result, 2);
+          expectBobsSuccess(result, 2);
         }),
       );
 
       test(
         requirement(
           Given: 'a failing job',
-          When: 'the job is evaluated',
+          When: 'the job is converted',
           Then: 'returns the second failure',
         ),
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => throw Exception(),
             onError: (error, s) => 'error1',
-          ).thenEvaluate(
+          ).thenConvert(
             onFailure: (error) => 'error2',
             onSuccess: (value) => fail('Should not be called'),
           );
 
           final result = await job.run();
 
-          bobsExpectFailure(result, 'error2');
+          expectBobsFailure(result, 'error2');
         }),
       );
     });
 
-    group('thenEvaluateOnSuccess', () {
+    group('thenConvertSuccess', () {
       test(
         requirement(
           Given: 'a failing job',
-          When: 'the job is evaluated',
+          When: 'the job is converted',
           Then: 'returns the first failure',
         ),
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => throw Exception(),
             onError: (error, s) => 'error1',
-          ).thenEvaluateOnSuccess((success) => fail('Should not be called'));
+          ).thenConvertSuccess((success) => fail('Should not be called'));
 
           final result = await job.run();
 
-          bobsExpectFailure(result, 'error1');
+          expectBobsFailure(result, 'error1');
         }),
       );
 
       test(
         requirement(
           Given: 'a successful job',
-          When: 'the job is evaluated',
+          When: 'the job is converted',
           Then: 'returns the second success',
         ),
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => 1,
             onError: (error, s) => 'error1',
-          ).thenEvaluateOnSuccess((success) => 2);
+          ).thenConvertSuccess((success) => 2);
 
           final result = await job.run();
 
-          bobsExpectSuccess(result, 2);
+          expectBobsSuccess(result, 2);
         }),
       );
     });
 
-    group('thenEvaluateOnFailure', () {
+    group('thenConvertFailure', () {
       test(
         requirement(
           Given: 'a successful job',
-          When: 'the job is evaluated',
+          When: 'the job is converted',
           Then: 'returns the first success',
         ),
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => 1,
             onError: (error, s) => 'error1',
-          ).thenEvaluateOnFailure((error) => fail('Should not be called'));
+          ).thenConvertFailure((error) => fail('Should not be called'));
 
           final result = await job.run();
 
-          bobsExpectSuccess(result, 1);
+          expectBobsSuccess(result, 1);
         }),
       );
 
       test(
         requirement(
           Given: 'a failing job',
-          When: 'the job is evaluated',
+          When: 'the job is converted',
           Then: 'returns the second failure',
         ),
         procedure(() async {
           final job = BobsJob.attempt(
             run: () => throw Exception(),
             onError: (error, s) => 'error1',
-          ).thenEvaluateOnFailure((error) => 'error2');
+          ).thenConvertFailure((error) => 'error2');
 
           final result = await job.run();
 
-          bobsExpectFailure(result, 'error2');
+          expectBobsFailure(result, 'error2');
+        }),
+      );
+    });
+
+    group('thenValidate', () {
+      test(
+        requirement(
+          Given: 'a successful job',
+          When: 'the job is valid',
+          Then: 'returns the success',
+        ),
+        procedure(() async {
+          final job = BobsJob.attempt(
+            run: () => 1,
+            onError: (error, s) => 'error1',
+          ).thenValidate(
+            isValid: (value) => value == 1,
+            onInvalid: (value) => fail('Should not be called'),
+          );
+
+          final result = await job.run();
+
+          expectBobsSuccess(result, 1);
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'a successful job',
+          When: 'the job is invalid',
+          Then: 'returns the second failure',
+        ),
+        procedure(() async {
+          final job = BobsJob.attempt(
+            run: () => 1,
+            onError: (error, s) => 'error1',
+          ).thenValidate(
+            isValid: (value) => value != 1,
+            onInvalid: (value) => 'error2',
+          );
+
+          final result = await job.run();
+
+          expectBobsFailure(result, 'error2');
         }),
       );
     });
@@ -340,7 +384,7 @@ void main() {
 
           final result = await combinedJob.run();
 
-          bobsExpectSuccess(result, '2');
+          expectBobsSuccess(result, '2');
         }),
       );
       test(
@@ -366,7 +410,7 @@ void main() {
 
           final result = await combinedJob.run();
 
-          bobsExpectFailure(result, '-2');
+          expectBobsFailure(result, '-2');
         }),
       );
 
@@ -389,7 +433,7 @@ void main() {
 
           final result = await combinedJob.run();
 
-          bobsExpectFailure(result, '-1');
+          expectBobsFailure(result, '-1');
         }),
       );
     });
@@ -406,7 +450,7 @@ void main() {
 
           final result = await job.run();
 
-          bobsExpectSuccess(result, 1);
+          expectBobsSuccess(result, 1);
         }),
       );
     });
@@ -423,7 +467,7 @@ void main() {
 
           final result = await job.run();
 
-          bobsExpectFailure(result, 1);
+          expectBobsFailure(result, 1);
         }),
       );
     });
