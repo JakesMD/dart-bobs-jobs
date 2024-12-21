@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_positional_boolean_parameters
-
 import 'dart:async';
 
 import 'package:bobs_jobs/bobs_jobs.dart';
@@ -48,7 +46,7 @@ class BobsJob<F, S> {
   BobsJob<F, S2> then<S2>({required FutureOr<S2> Function(S) run}) => BobsJob(
         run: () async {
           final result = await this.run();
-          return result.evaluate(
+          return result.resolve(
             onFailure: BobsFailure<F, S2>.new,
             onSuccess: (success) async => BobsSuccess(await run(success)),
           );
@@ -69,7 +67,7 @@ class BobsJob<F, S> {
       BobsJob(
         run: () async {
           final result = await this.run();
-          return result.evaluate(
+          return result.resolve(
             onFailure: BobsFailure<F, S2>.new,
             onSuccess: (success) => BobsJob.attempt(
               run: () => run(success),
@@ -79,41 +77,70 @@ class BobsJob<F, S> {
         },
       );
 
-  /// Evaluates the outcome of the job.
-  BobsJob<F2, S2> thenEvaluate<F2, S2>({
+  /// Converts the outcome of the job to a new outcome.
+  ///
+  /// `onFailure`: The function to convert the failure value.
+  ///
+  /// `onSuccess`: The function to convert the success value.
+  BobsJob<F2, S2> thenConvert<F2, S2>({
     required F2 Function(F error) onFailure,
     required S2 Function(S success) onSuccess,
   }) =>
       BobsJob(
         run: () async {
           final result = await this.run();
-          return result.evaluate(
+          return result.resolve(
             onFailure: (failure) => BobsFailure<F2, S2>(onFailure(failure)),
             onSuccess: (success) => BobsSuccess<F2, S2>(onSuccess(success)),
           );
         },
       );
 
-  /// Evaluates the outcome of the job but only in the case of a success.
-  BobsJob<F, S2> thenEvaluateOnSuccess<S2>(S2 Function(S success) onSuccess) =>
+  /// Converts the success outcome of the job to a new success outcome.
+  BobsJob<F, S2> thenConvertSuccess<S2>(S2 Function(S success) onSuccess) =>
       BobsJob(
         run: () async {
           final result = await this.run();
-          return result.evaluate(
+          return result.resolve(
             onFailure: BobsFailure<F, S2>.new,
             onSuccess: (success) => BobsSuccess<F, S2>(onSuccess(success)),
           );
         },
       );
 
-  /// Evaluates the outcome of the job but only in the case of a failure.
-  BobsJob<F2, S> thenEvaluateOnFailure<F2>(F2 Function(F error) onFailure) =>
+  /// Converts the failure outcome of the job to a new failure outcome.
+  BobsJob<F2, S> thenConvertFailure<F2>(F2 Function(F error) onFailure) =>
       BobsJob(
         run: () async {
           final result = await this.run();
-          return result.evaluate(
+          return result.resolve(
             onFailure: (failure) => BobsFailure<F2, S>(onFailure(failure)),
             onSuccess: BobsSuccess<F2, S>.new,
+          );
+        },
+      );
+
+  /// Validates the success outcome of the job.
+  ///
+  /// This enables you to return a failure outcome from a success outcome.
+  ///
+  /// `isValid`: The function to determine if the success outcome is valid.
+  ///
+  /// `onInvalid`: The failure value to return if the success outcome is
+  ///              invalid.
+  BobsJob<F, S> thenValidate({
+    required bool Function(S success) isValid,
+    required F Function(S success) onInvalid,
+  }) =>
+      BobsJob(
+        run: () async {
+          final result = await this.run();
+          return result.resolve(
+            onFailure: BobsFailure<F, S>.new,
+            onSuccess: (success) {
+              if (isValid(success)) return BobsSuccess<F, S>(success);
+              return BobsFailure<F, S>(onInvalid(success));
+            },
           );
         },
       );
