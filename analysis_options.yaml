@@ -3,6 +3,7 @@ include: package:very_good_analysis/analysis_options.yaml
 analyzer:
   errors:
     avoid_equals_and_hash_code_on_mutable_classes: ignore
+    avoid_catches_without_on_clauses: ignore
   language:
     strict-inference: false
 

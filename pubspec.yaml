@@ -1,6 +1,6 @@
 name: bobs_jobs
-description: Functional programming with a pinch of salt.
-version: 0.0.1-dev.9
+description: Lightweight functional programming for pragmatic Dart developers.
+version: 0.0.1-dev.10
 repository: https://github.com/JakesMD/dart-bobs-jobs
 
 environment:
@@ -12,4 +12,4 @@ dependencies:
 dev_dependencies:
   mocktail: ^1.0.4
   test_beautifier: ^1.1.0
-  very_good_analysis: ^6.0.0
+  very_good_analysis: ^7.0.0

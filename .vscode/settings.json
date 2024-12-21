@@ -14,7 +14,7 @@
         "**/coverage": true,
         "**/build": true,
         "**/pubspec.lock": true,
-        "**/analysis_options.yaml": true,
+        "**/analysis_options.yaml": false,
         "**/.gitignore": true,
     },
     "testing.automaticallyOpenPeekView": "never"
