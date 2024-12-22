@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.1-dev.11
+- 🐛 Fix typos in `BobsMaybe`
+
 ## 0.0.1-dev.10
 - ✨ Add ability to validate the success value of a job outcome
 - ✏️ Rename `evaluate` to `convert` in `BobsJob`

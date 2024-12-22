@@ -4,15 +4,15 @@ import 'package:test_beautifier/test_beautifier.dart';
 
 void main() {
   group('BobsMaybe tests', () {
-    group('evaluate', () {
+    group('resolve', () {
       test(
         requirement(
           Given: 'a present value',
-          When: 'the maybe is evaluated',
+          When: 'the maybe is resolved',
           Then: 'the [onPresent] function is called',
         ),
         procedure(() {
-          final result = bobsPresent(1).evaluate(
+          final result = bobsPresent(1).resolve(
             onAbsent: () => fail('Should not be called'),
             onPresent: (value) => value,
           );
@@ -24,11 +24,11 @@ void main() {
       test(
         requirement(
           Given: 'an absent value',
-          When: 'the maybe is evaluated',
+          When: 'the maybe is resolved',
           Then: 'the [onAbsent] function is called',
         ),
         procedure(() {
-          final result = BobsAbsent().evaluate(
+          final result = BobsAbsent().resolve(
             onAbsent: () => 'bobsAbsent',
             onPresent: (_) => fail('Should not be called'),
           );
@@ -42,11 +42,11 @@ void main() {
       test(
         requirement(
           Given: 'a present value',
-          When: 'the maybe is derived',
+          When: 'the maybe is converted',
           Then: 'returns a new maybe with the new value',
         ),
         procedure(() {
-          final result = bobsPresent(1).deriveOnPresent((value) => value + 1);
+          final result = bobsPresent(1).convert((value) => value + 1);
 
           expect(result, bobsPresent(2));
         }),
@@ -55,12 +55,11 @@ void main() {
       test(
         requirement(
           Given: 'an absent value',
-          When: 'the maybe is derived',
+          When: 'the maybe is converted',
           Then: 'returns an absent maybe',
         ),
         procedure(() {
-          final result =
-              BobsAbsent<int>().deriveOnPresent((value) => value + 1);
+          final result = BobsAbsent<int>().convert((value) => value + 1);
 
           expect(result, bobsAbsent());
         }),

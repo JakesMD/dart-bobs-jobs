@@ -1,11 +1,11 @@
 /// A maybe type represents a value that may or may not be present.
 sealed class BobsMaybe<T> {
-  /// Evaluates the maybe.
+  /// Resolves the maybe into a single type.
   ///
   /// If the maybe is present, the [onPresent] function is called with the
   /// value.
   /// If the maybe is absent, the [onAbsent] function is called.
-  T2 evaluate<T2>({
+  T2 resolve<T2>({
     required T2 Function(T value) onPresent,
     required T2 Function() onAbsent,
   }) {
@@ -20,7 +20,7 @@ sealed class BobsMaybe<T> {
   ///
   /// If the maybe is present, the value will be replaced with the result of
   /// [onPresent].
-  BobsMaybe<T2> deriveOnPresent<T2>(T2 Function(T value) onPresent) {
+  BobsMaybe<T2> convert<T2>(T2 Function(T value) onPresent) {
     if (this is BobsPresent<T>) {
       return BobsPresent(onPresent((this as BobsPresent<T>).value));
     } else {
