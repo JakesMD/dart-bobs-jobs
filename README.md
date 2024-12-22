@@ -74,7 +74,7 @@ try {
 ``` dart
 BobsJob<WeatherFetchException, Weather> fetchWeather({
     required double latitude,
-    required double longitude,d
+    required double longitude,
 }) =>
     BobsJob.attempt(
         run: () => _httpClient.get(
@@ -103,7 +103,7 @@ BobsJob<WeatherFetchException, Weather> fetchWeather({
         );
 ```
 ``` dart
-final outcome = fetchWeather(latitude: 123456, longitude: 123456);
+final outcome = await fetchWeather(latitude: 123456, longitude: 123456).run();
 
 final message = outcome.resolve(
     onFailure: (exception) => switch (exception) {
