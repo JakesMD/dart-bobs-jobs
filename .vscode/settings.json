@@ -4,7 +4,7 @@
     },
     "files.exclude": {
         "coverage_badge.svg": true,
-        "LICENSE": true,
+        "LICENSE": false,
         "**/.branches": true,
         "**/.dart_tool/": true,
         "**/.idea/": true,

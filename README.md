@@ -1,102 +1,128 @@
-# Dart Bob's Jobs
+# Bob's Jobs
+Lightweight, descriptive functional programming for pragmatic Dart developers.
 
 ![coverage][coverage_badge]
 [![pub package][pub_badge]][pub_link]
 ![style: very good analysis][very_good_analysis_badge]
-![License: MIT][license_badge]
+![license: BSD 3][license_badge]
 
-I appreciate the core ideas of functional programming, but I prefer a more balanced approach over going all-in.
 
-Functional programming avoids mutable state that could change unexpectedly, making the code easier to read and maintain. But I also discovered that a well designed functional programming package could significantly improve ease of testing.
+## 🧑‍💻 Who's Bob?
 
-That’s why I created this Dart package: it cherry-picks the best features of functional programming while prioritizing simplicity, maintainability, and ease of testing.
+Bob started out like many developers—obsessed with "clean code." But after years of drowning in massive, sprawling codebases, he realized "clean" meant a total nightmare. Code that was supposed to be easy to maintain turned into a tangled mess of bugs, broken promises, and endless refactoring. Thanks, Bob 😉.
 
-Unlike many functional programming packages that are large and complex, this package is designed to be lightweight and intuitive. Its simplicity allows anyone to clone and adapt it to their needs without needing to sift through extensive documentation first.
+Then, Bob discovered functional programming. It promised to reduce bugs, improve maintainability, and make testing a breeze. But the tools? Cryptic naming conventions and bloated packages with hundreds of methods that were hard to wrap your head around—let alone Bob’s.
 
-I have deliberately avoided traditional functional programming naming conventions so that developers and reviewers with little prior knowledge of functional programming can easily understand your code.
+Bob needed something better. Something simple, clear, and practical. And Bob’s your uncle, this package was born—bringing the power of functional programming without the complexity.
 
-Dart Bob's Jobs is already being used in multiple production Flutter apps, proving its reliability and practicality.
+
+## ✨ Features
+
+- **Reads Like a Book:** No cryptic naming conventions—just clear, intuitive functional programming.
+- **Lightweight:** Cuts through complexity, letting you clone, adapt, and integrate with ease—no need to wade through lengthy documentation.
+- **Proven in Production:** Already trusted in multiple production Flutter apps, demonstrating its reliability and real-world practicality.
 
 
 
 ## 🕹️ Usage  
 
-### Creating a Job  
+### Pure Dart vs Bobs Jobs
 
-Jobs don’t throw exceptions about the place. Instead, they handle errors gracefully by returning either the exception (if the job failed) or the result (if the job succeeded).  
-
-Here’s a simple example:  
-```dart
-const jsonString = '{"name": "John", "age": 30}';
-
-final job = BobsJob.attempt(
-    run: () => jsonDecode(jsonString) as Map,
-    onError: (error, stack) => InvalidJSONException(),
-);
-
-final outcome = await job.run();
-
-final message = outcome.resolve(
-    onFailure: (exception) => 'Invalid JSON.',
-    onSuccess: (json) => json.toString(),
-);
-
-print(message);
-```  
-
-### Converting Outcomes
-What if we only need a specific key from the JSON? We can easily do that by converting the success:
-```dart
-final job = BobsJob.attempt(
-    run: () => jsonDecode(jsonString) as Map,
-    onError: (error, stack) => InvalidJSONException(),
-).thenConvertSuccess((json) => json['age'] as int);
-
-final outcome = await job.run();
-
-final message = outcome.resolve(
-    onFailure: (exception) => 'Invalid JSON.',
-    onSuccess: (age) => 'Age: $age',
-);
-
-print(message);
-```  
-
-### Chaining Jobs
-
-But what if the JSON doesn’t contain the key we need? Instead of converting the success, we'll just chain another job:
-```dart
-final job = BobsJob.attempt(
-    run: () => jsonDecode(jsonString) as Map,
-    onError: (error, stack) => InvalidJSONException(),
-).thenAttempt(
-    run: (json) => json['age'] as int,
-    onError: (error, stack) => InvalidJSONException(),
-);
-```  
-
-### Validation
-Or, instead of brute-forcing the call, we could simply add a validation step:
+#### Pure Dart
 ``` dart
-final job = BobsJob.attempt(
-    run: () => jsonDecode(jsonString) as Map,
-    onError: (error, stack) => InvalidJSONException(),
-)
-    .thenValidate(
-        isValid: (json) => json.containsKey('age'),
-        onInvalid: (json) => InvalidJSONException(),
-    )
-    .thenConvertSuccess((json) => json['age'] as int);
+Future<Weather> fetchWeather({
+    required double latitude,
+    required double longitude,
+}) async {
+    final weatherRequest = Uri.https('api.open-meteo.com', 'v1/forecast', {
+        'latitude': '$latitude',
+        'longitude': '$longitude',
+        'current_weather': 'true',
+    });
+
+    final weatherResponse = await _httpClient.get(weatherRequest);
+
+    if (weatherResponse.statusCode != 200) {
+        throw WeatherRequestFailure();
+    }
+
+    final bodyJson = jsonDecode(weatherResponse.body) as Map<String, dynamic>;
+
+    if (!bodyJson.containsKey('current_weather')) {
+        throw WeatherNotFoundFailure();
+    }
+
+    final weatherJson = bodyJson['current_weather'] as Map<String, dynamic>;
+
+    return Weather.fromJson(weatherJson);
+}
+```
+``` dart
+try {
+    final weather = await fetchWeather(123456, 123456);
+    print('Weather: $weather');
+} on WeatherRequestFailure {
+    print('something went wrong');
+} on WeatherNotFoundFailure {
+    print('weather not found');
+} catch (e) {
+    print('something went wrong');
+}
 ```
 
+#### Bobs Jobs
+``` dart
+BobsJob<WeatherFetchException, Weather> fetchWeather({
+    required double latitude,
+    required double longitude,d
+}) =>
+    BobsJob.attempt(
+        run: () => _httpClient.get(
+            Uri.https('api.open-meteo.com', 'v1/forecast', {
+                'latitude': '$latitude',
+                'longitude': '$longitude',
+                'current_weather': 'true',
+            }),
+        ),
+        onError: (error, stack) => WeatherFetchException.requestFailed,
+    )
+        .thenValidate(
+            isValid: (response) => response.statusCode == 200,
+            onInvalid: (response) => WeatherFetchException.requestFailed,
+        )
+        .thenAttempt(
+            run: (response) => jsonDecode(response.body) as Map,
+            onError: (error, stack) => WeatherFetchException.requestFailed,
+        )
+        .thenValidate(
+            isValid: (json) => json.containsKey('current_weather'),
+            onInvalid: (json) => WeatherFetchException.notFound,
+        )
+        .thenConvertSuccess(
+            (json) => Weather.fromJson(json['current_weather'] as Map<String, dynamic>),
+        );
+```
+``` dart
+final outcome = fetchWeather(latitude: 123456, longitude: 123456);
+
+final message = outcome.resolve(
+    onFailure: (exception) => switch (exception) {
+        WeatherFetchException.requestFailed => 'something went wrong',
+        WeatherFetchException.notFound => 'weather not found',
+    },
+    onSuccess: (weather) => 'Weather: $weather',
+);
+
+print(message);
+```
+
+---
 
 More docs coming...
 
 
-
-
 [coverage_badge]: https://raw.githubusercontent.com/VeryGoodOpenSource/very_good_cli/main/coverage_badge.svg
-[license_badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[license_badge]: https://img.shields.io/badge/license-BSD3-blue.svg
 [pub_badge]: https://img.shields.io/pub/v/bobs_jobs.svg
 [pub_link]: https://pub.dartlang.org/packages/bobs_jobs
 [very_good_analysis_badge]: https://img.shields.io/badge/style-very_good_analysis-B22C89.svg
