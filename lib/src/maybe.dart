@@ -33,6 +33,10 @@ sealed class BobsMaybe<T> {
 
   /// Returns `true` if the value is absent.
   bool get isAbsent => this is BobsAbsent<T>;
+
+  /// Returns the value if present, otherwise returns `null`.
+  T? get asNullable =>
+      resolve(onPresent: (value) => value, onAbsent: () => null);
 }
 
 /// {@template BobsPresent}

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.1-dev.12
+- ✨ Add `asNullable` to `BobsMaybe`
+
 ## 0.0.1-dev.11
 - 🐛 Fix typos in `BobsMaybe`
 

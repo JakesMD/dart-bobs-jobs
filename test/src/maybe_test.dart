@@ -114,6 +114,30 @@ void main() {
       );
     });
 
+    group('asNullable', () {
+      test(
+        requirement(
+          Given: 'a present value',
+          When: 'asNullable is called',
+          Then: 'returns the value',
+        ),
+        procedure(() {
+          expect(bobsPresent(1).asNullable, 1);
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'an absent value',
+          When: 'asNullable is called',
+          Then: 'returns null',
+        ),
+        procedure(() {
+          expect(bobsAbsent().asNullable, isNull);
+        }),
+      );
+    });
+
     group('bobsPresent', () {
       test(
         requirement(
