@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.1-dev.13
+- ✨ Add ability to construct a `BobsMaybe` from a nullable value
+
 ## 0.0.1-dev.12
 - ✨ Add `asNullable` to `BobsMaybe`
 

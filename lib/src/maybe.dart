@@ -28,6 +28,13 @@ sealed class BobsMaybe<T> {
     }
   }
 
+  /// Creates a new maybe from a nullable value.
+  ///
+  /// If the value is not `null`, a present maybe is created.
+  /// If the value is `null`, an absent maybe is created.
+  static BobsMaybe<T> from<T>(T? value) =>
+      value != null ? bobsPresent(value) : bobsAbsent();
+
   /// Returns 'true' if the value is present.
   bool get isPresent => this is BobsPresent<T>;
 
@@ -77,3 +84,6 @@ BobsMaybe<T> bobsAbsent<T>() => BobsAbsent<T>();
 
 /// Creates an instance of [BobsPresent].
 BobsMaybe<T> bobsPresent<T>(T value) => BobsPresent(value);
+
+/// Creates an instance of [BobsMaybe] from a nullable value.
+BobsMaybe<T> bobsMaybe<T>(T? value) => BobsMaybe.from(value);

@@ -38,7 +38,7 @@ void main() {
       );
     });
 
-    group('deriveOnBobsPresent', () {
+    group('convert', () {
       test(
         requirement(
           Given: 'a present value',
@@ -201,6 +201,33 @@ void main() {
         ),
         procedure(() {
           expect(bobsAbsent().hashCode, isA<int>());
+        }),
+      );
+    });
+    group('bobsMaybe', () {
+      test(
+        requirement(
+          Given: 'a non-null value',
+          When: 'bobsMaybe is called',
+          Then: 'returns a present maybe',
+        ),
+        procedure(() {
+          final result = bobsMaybe(1);
+
+          expect(result, bobsPresent(1));
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'a null value',
+          When: 'bobsMaybe is called',
+          Then: 'returns an absent maybe',
+        ),
+        procedure(() {
+          final result = bobsMaybe(null);
+
+          expect(result, bobsAbsent());
         }),
       );
     });
