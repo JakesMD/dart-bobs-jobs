@@ -25,14 +25,14 @@ class BobsJob<F, S> {
   /// error.
   factory BobsJob.attempt({
     required FutureOr<S> Function() run,
-    required F Function(Object error, StackTrace stack) onError,
+    required F Function(Object error) onError,
   }) =>
       BobsJob<F, S>(
         run: () async {
           try {
             return BobsSuccess<F, S>(await run());
           } catch (error, stack) {
-            final failure = onError(error, stack);
+            final failure = onError(error);
             BigBob.onFailure(failure, error, stack);
             return BobsFailure<F, S>(failure);
           }
@@ -64,7 +64,7 @@ class BobsJob<F, S> {
   /// error.
   BobsJob<F, S2> thenAttempt<S2>({
     required FutureOr<S2> Function(S) run,
-    required F Function(Object error, StackTrace stack) onError,
+    required F Function(Object error) onError,
   }) =>
       BobsJob(
         run: () async {
@@ -73,11 +73,7 @@ class BobsJob<F, S> {
             onFailure: BobsFailure<F, S2>.new,
             onSuccess: (success) => BobsJob.attempt(
               run: () => run(success),
-              onError: (error, stack) {
-                final failure = onError(error, stack);
-                BigBob.onFailure(failure, error, stack);
-                return failure;
-              },
+              onError: onError,
             ).run(),
           );
         },

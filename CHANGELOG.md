@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.1-dev.15
+- 🔥 Remove `stackTrace` from `onError` callbacks
+
 ## 0.0.1-dev.14
 - ✨ Add global and customizable `onFailure` callback
 

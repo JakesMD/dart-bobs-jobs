@@ -29,7 +29,7 @@ class OpenMeteoClient {
             {'name': locationName, 'count': '1'},
           ),
         ),
-        onError: (_, __) => LocationFetchException.requestFailed,
+        onError: (_) => LocationFetchException.requestFailed,
       )
           .thenValidate(
             isValid: (response) => response.statusCode == 200,
@@ -63,7 +63,7 @@ class OpenMeteoClient {
             'current_weather': 'true',
           }),
         ),
-        onError: (_, __) => WeatherFetchException.requestFailed,
+        onError: (_) => WeatherFetchException.requestFailed,
       )
           .thenValidate(
             isValid: (response) => response.statusCode == 200,
