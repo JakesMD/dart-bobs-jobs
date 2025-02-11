@@ -4,6 +4,10 @@ import 'package:test_beautifier/test_beautifier.dart';
 
 void main() {
   group('BobsJob tests', () {
+    setUp(() {
+      BigBob.onFailure = (_, __, ___) {};
+    });
+
     group('run', () {
       test(
         requirement(
@@ -70,6 +74,24 @@ void main() {
           final result = await job.run();
 
           expectBobsFailure(result, 'error');
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'a failing job',
+          When: 'the job is run',
+          Then: 'global [onFailure] callback is called',
+        ),
+        procedure(() async {
+          BigBob.onFailure = (failure, error, stack) => expect(1, 1);
+
+          final job = BobsJob.attempt(
+            run: () => throw Exception(),
+            onError: (error, s) => 'error',
+          );
+
+          await job.run();
         }),
       );
     });
@@ -152,6 +174,27 @@ void main() {
           final result = await job.run();
 
           expectBobsFailure(result, 'error2');
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'a successful job chained with a failing job',
+          When: 'the job is run',
+          Then: 'global [onFailure] callback is called',
+        ),
+        procedure(() async {
+          BigBob.onFailure = (failure, error, stack) => expect(1, 1);
+
+          final job = BobsJob.attempt(
+            run: () => 1,
+            onError: (error, s) => 'error1',
+          ).thenAttempt(
+            run: (value) => throw Exception(),
+            onError: (error, stack) => 'error2',
+          );
+
+          await job.run();
         }),
       );
 
@@ -356,6 +399,27 @@ void main() {
           final result = await job.run();
 
           expectBobsFailure(result, 'error2');
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'a successful job',
+          When: 'the job is invalid',
+          Then: 'global [onFailure] callback is called',
+        ),
+        procedure(() async {
+          BigBob.onFailure = (failure, _, __) => expect(1, 1);
+
+          final job = BobsJob.attempt(
+            run: () => 1,
+            onError: (error, s) => 'error1',
+          ).thenValidate(
+            isValid: (value) => value != 1,
+            onInvalid: (value) => 'error2',
+          );
+
+          await job.run();
         }),
       );
     });

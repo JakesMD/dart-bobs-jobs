@@ -32,7 +32,9 @@ class BobsJob<F, S> {
           try {
             return BobsSuccess<F, S>(await run());
           } catch (error, stack) {
-            return BobsFailure<F, S>(onError(error, stack));
+            final failure = onError(error, stack);
+            BigBob.onFailure(failure, error, stack);
+            return BobsFailure<F, S>(failure);
           }
         },
       );
@@ -71,7 +73,11 @@ class BobsJob<F, S> {
             onFailure: BobsFailure<F, S2>.new,
             onSuccess: (success) => BobsJob.attempt(
               run: () => run(success),
-              onError: onError,
+              onError: (error, stack) {
+                final failure = onError(error, stack);
+                BigBob.onFailure(failure, error, stack);
+                return failure;
+              },
             ).run(),
           );
         },
@@ -83,7 +89,7 @@ class BobsJob<F, S> {
   ///
   /// `onSuccess`: The function to convert the success value.
   BobsJob<F2, S2> thenConvert<F2, S2>({
-    required F2 Function(F error) onFailure,
+    required F2 Function(F failure) onFailure,
     required S2 Function(S success) onSuccess,
   }) =>
       BobsJob(
@@ -109,7 +115,7 @@ class BobsJob<F, S> {
       );
 
   /// Converts the failure outcome of the job to a new failure outcome.
-  BobsJob<F2, S> thenConvertFailure<F2>(F2 Function(F error) onFailure) =>
+  BobsJob<F2, S> thenConvertFailure<F2>(F2 Function(F failure) onFailure) =>
       BobsJob(
         run: () async {
           final result = await this.run();
@@ -139,7 +145,10 @@ class BobsJob<F, S> {
             onFailure: BobsFailure<F, S>.new,
             onSuccess: (success) {
               if (isValid(success)) return BobsSuccess<F, S>(success);
-              return BobsFailure<F, S>(onInvalid(success));
+
+              final failure = onInvalid(success);
+              BigBob.onFailure(failure, null, null);
+              return BobsFailure<F, S>(failure);
             },
           );
         },
@@ -159,11 +168,11 @@ class BobsJob<F, S> {
         run: () async {
           final result1 = await this.run();
 
-          if (result1 is BobsFailure<F, S>) {
-            return BobsFailure<F2, S2>(onFailure(result1.value));
+          if (result1.failed) {
+            return BobsFailure<F2, S2>(onFailure(result1.asFailure));
           }
 
-          return await nextJob((result1 as BobsSuccess<F, S>).value).run();
+          return await nextJob(result1.asSuccess).run();
         },
       );
 
