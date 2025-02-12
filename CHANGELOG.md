@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.1-dev.16
+- ✨ Add `BobsStream` (experimental)
+
 ## 0.0.1-dev.15
 - 🔥 Remove `stackTrace` from `onError` callbacks
 

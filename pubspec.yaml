@@ -1,6 +1,6 @@
 name: bobs_jobs
 description: Lightweight, descriptive functional programming for pragmatic Dart developers.
-version: 0.0.1-dev.15
+version: 0.0.1-dev.16
 repository: https://github.com/JakesMD/dart-bobs-jobs
 
 environment:
