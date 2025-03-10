@@ -359,7 +359,7 @@ void main() {
       );
     });
 
-    group('thenValidate', () {
+    group('thenValidateSuccess', () {
       test(
         requirement(
           Given: 'a successful job',
@@ -370,7 +370,7 @@ void main() {
           final job = BobsJob.attempt(
             run: () => 1,
             onError: (error) => 'error1',
-          ).thenValidate(
+          ).thenValidateSuccess(
             isValid: (value) => value == 1,
             onInvalid: (value) => fail('Should not be called'),
           );
@@ -391,7 +391,7 @@ void main() {
           final job = BobsJob.attempt(
             run: () => 1,
             onError: (error) => 'error1',
-          ).thenValidate(
+          ).thenValidateSuccess(
             isValid: (value) => value != 1,
             onInvalid: (value) => 'error2',
           );
@@ -414,12 +414,56 @@ void main() {
           final job = BobsJob.attempt(
             run: () => 1,
             onError: (error) => 'error1',
-          ).thenValidate(
+          ).thenValidateSuccess(
             isValid: (value) => value != 1,
             onInvalid: (value) => 'error2',
           );
 
           await job.run();
+        }),
+      );
+    });
+
+    group('thenValidateFailure', () {
+      test(
+        requirement(
+          Given: 'a failed job',
+          When: 'the job is valid',
+          Then: 'returns the failure',
+        ),
+        procedure(() async {
+          final job = BobsJob.attempt(
+            run: () => throw Exception(),
+            onError: (error) => 'error1',
+          ).thenValidateFailure(
+            isValid: (value) => value == 'error1',
+            onInvalid: (value) => fail('Should not be called'),
+          );
+
+          final result = await job.run();
+
+          expectBobsFailure(result, 'error1');
+        }),
+      );
+
+      test(
+        requirement(
+          Given: 'a failed job',
+          When: 'the job is invalid',
+          Then: 'returns the second success',
+        ),
+        procedure(() async {
+          final job = BobsJob<String, int>.attempt(
+            run: () => throw Exception(),
+            onError: (error) => 'error1',
+          ).thenValidateFailure(
+            isValid: (value) => value != 'error1',
+            onInvalid: (value) => 1,
+          );
+
+          final result = await job.run();
+
+          expectBobsSuccess(result, 1);
         }),
       );
     });

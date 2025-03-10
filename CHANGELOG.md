@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.1-dev.17 - 10.03.25
+- ✨ Add `validateFailure`
+- ✏️ Rename `validate` to `validateSuccess`
+
 ## 0.0.1-dev.16
 - ✨ Add `BobsStream` (experimental)
 

@@ -130,7 +130,7 @@ class BobsJob<F, S> {
   ///
   /// `onInvalid`: The failure value to return if the success outcome is
   ///              invalid.
-  BobsJob<F, S> thenValidate({
+  BobsJob<F, S> thenValidateSuccess({
     required bool Function(S success) isValid,
     required F Function(S success) onInvalid,
   }) =>
@@ -145,6 +145,31 @@ class BobsJob<F, S> {
               final failure = onInvalid(success);
               BigBob.onFailure(failure, null, null);
               return BobsFailure<F, S>(failure);
+            },
+          );
+        },
+      );
+
+  /// Validates the failure outcome of the job.
+  ///
+  /// This enables you to return a success outcome from a failure outcome.
+  ///
+  /// `isValid`: The function to determine if the failure outcome is valid.
+  ///
+  /// `onInvalid`: The failure value to return if the failure outcome is
+  ///              invalid.
+  BobsJob<F, S> thenValidateFailure({
+    required bool Function(F failure) isValid,
+    required S Function(F failure) onInvalid,
+  }) =>
+      BobsJob(
+        run: () async {
+          final result = await this.run();
+          return result.resolve(
+            onSuccess: BobsSuccess<F, S>.new,
+            onFailure: (failure) {
+              if (isValid(failure)) return BobsFailure<F, S>(failure);
+              return BobsSuccess<F, S>(onInvalid(failure));
             },
           );
         },

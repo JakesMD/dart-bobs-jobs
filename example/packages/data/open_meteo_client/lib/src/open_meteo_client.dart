@@ -31,17 +31,17 @@ class OpenMeteoClient {
         ),
         onError: (_) => LocationFetchException.requestFailed,
       )
-          .thenValidate(
+          .thenValidateSuccess(
             isValid: (response) => response.statusCode == 200,
             onInvalid: (_) => LocationFetchException.requestFailed,
           )
           .thenConvertSuccess((response) => jsonDecode(response.body) as Map)
-          .thenValidate(
+          .thenValidateSuccess(
             isValid: (json) => json.containsKey('results'),
             onInvalid: (_) => LocationFetchException.notFound,
           )
           .thenConvertSuccess((json) => json['results'] as List)
-          .thenValidate(
+          .thenValidateSuccess(
             isValid: (results) => results.isNotEmpty,
             onInvalid: (_) => LocationFetchException.notFound,
           )
@@ -65,12 +65,12 @@ class OpenMeteoClient {
         ),
         onError: (_) => WeatherFetchException.requestFailed,
       )
-          .thenValidate(
+          .thenValidateSuccess(
             isValid: (response) => response.statusCode == 200,
             onInvalid: (_) => WeatherFetchException.requestFailed,
           )
           .thenConvertSuccess((response) => jsonDecode(response.body) as Map)
-          .thenValidate(
+          .thenValidateSuccess(
             isValid: (json) => json.containsKey('current_weather'),
             onInvalid: (_) => WeatherFetchException.notFound,
           )

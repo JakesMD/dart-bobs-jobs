@@ -86,7 +86,7 @@ BobsJob<WeatherFetchException, Weather> fetchWeather({
         ),
         onError: (error, stack) => WeatherFetchException.requestFailed,
     )
-        .thenValidate(
+        .thenValidateSuccess(
             isValid: (response) => response.statusCode == 200,
             onInvalid: (response) => WeatherFetchException.requestFailed,
         )
@@ -94,7 +94,7 @@ BobsJob<WeatherFetchException, Weather> fetchWeather({
             run: (response) => jsonDecode(response.body) as Map,
             onError: (error, stack) => WeatherFetchException.requestFailed,
         )
-        .thenValidate(
+        .thenValidateSuccess(
             isValid: (json) => json.containsKey('current_weather'),
             onInvalid: (json) => WeatherFetchException.notFound,
         )
