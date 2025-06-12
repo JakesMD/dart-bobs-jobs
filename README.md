@@ -116,9 +116,103 @@ final message = outcome.resolve(
 print(message);
 ```
 
----
+### BobsMaybe
 
-More docs coming...
+A `BobsMaybe` represents a value that may or may not be present, or in other words, a value that may be null.
+
+#### 1. Usecase: Improve handling of nullable values (useful for job outcomes)
+``` dart
+final nullableText = bobsMaybe('Hello World');
+
+final message = maybe.resolve(
+    onPresent: (text) => text,
+    onAbsent: () => 'No text',
+);
+
+print(message); // Hello World
+```
+
+#### 2. Usecase: `copyWith`
+
+In a normal `copyWith` method, passing a parameter that is null will result in the parameter being ignored. But what if you don't want it to be ignored?
+``` dart
+class Text {
+  const Text({this.text});
+
+  final String? text;
+
+  Text copyWith({BobsMaybe<String>? text}) =>
+      Text(text: text?.asNullable ?? this.text);
+}
+
+var text = const Text(text: 'Hello World');
+
+text = text.copyWith();
+print(text.text); // Hello World
+
+text = text.copyWith(text: bobsPresent('Hello World 2'));
+print(text.text); // Hello World 2
+
+text = text.copyWith(text: bobsAbsent());
+print(text.text); // null
+```
+
+#### Create `BobsMaybe` from nullable
+``` dart
+var maybe = bobsMaybe('not null');
+
+print(maybe.isPresent) // true
+
+maybe = bobsMaybe(null);
+
+print(maybe.isPresent) // false
+```
+
+#### Resolve the maybe
+``` dart
+final maybe = bobsPresent('Hello World');
+
+final message = maybe.resolve(
+    onPresent: (text) => text,
+    onAbsent: () => 'No text',
+);
+
+print(message); // Hello World
+```
+
+#### Create a present value
+``` dart
+var maybe = bobsPresent('Hello World');
+print(maybe.isPresent) // true
+```
+
+#### Create an absent value
+``` dart
+var maybe = bobsAbsent();
+print(maybe.isPresent) // false
+```
+
+#### Convert `BobsMaybe` to nullable
+``` dart
+var maybe = bobsPresent('Hello World');
+var nullable = maybe.asNullable;
+
+print(nullable) // Hello World
+
+maybe = bobsAbsent();
+nullable = maybe.asNullable;
+
+print(nullable) // null
+```
+
+#### Convert the value if present
+``` dart
+final maybeText = bobsPresent('Hello World');
+final maybeUppercaseText = maybeText.convert((text) => text.toUpperCase());
+```
+
+
+
 
 
 [coverage_badge]: https://raw.githubusercontent.com/VeryGoodOpenSource/very_good_cli/main/coverage_badge.svg
