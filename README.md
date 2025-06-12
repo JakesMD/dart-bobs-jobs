@@ -116,6 +116,27 @@ final message = outcome.resolve(
 print(message);
 ```
 
+### BobsNothing
+A `BobsNothing` represents... nothing. It's used for when a successful job doesn't return anything.
+
+``` dart
+BobsJob<DeleteException, BobsNothing> deleteBook(BigInt id) =>
+    BobsJob.attempt(
+      run: () => database.deleteBook(id),
+      onError: (_) => DeleteException.databaseError,
+    ).thenConvertSuccess((_) => bobsNothing);
+
+final outcome = await deleteBook(BigInt.from(345)).run();
+
+final message = outcome.resolve(
+  onFailure: (_) => 'Failed',
+  onSuccess: (_) => 'Succeeded',
+);
+
+print(message);
+```
+
+
 ### BobsMaybe
 
 A `BobsMaybe` represents a value that may or may not be present, or in other words, a value that may be null.
@@ -168,7 +189,7 @@ maybe = bobsMaybe(null);
 print(maybe.isPresent) // false
 ```
 
-#### Resolve the maybe
+#### Resolve a `BobsMaybe`
 ``` dart
 final maybe = bobsPresent('Hello World');
 
@@ -210,8 +231,6 @@ print(nullable) // null
 final maybeText = bobsPresent('Hello World');
 final maybeUppercaseText = maybeText.convert((text) => text.toUpperCase());
 ```
-
-
 
 
 
