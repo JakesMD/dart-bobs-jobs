@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.0 - 13.06.25
+- 📝 Improve documentation
+
 ## 0.0.1-dev.17 - 10.03.25
 - ✨ Add `validateFailure`
 - ✏️ Rename `validate` to `validateSuccess`
