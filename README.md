@@ -116,6 +116,62 @@ final message = outcome.resolve(
 print(message);
 ```
 
+
+### BobsOutcome
+A `BobsOutcome` represents the result of a job. It can be either a success or a failure.
+
+``` dart
+final outcome = bobsSuccess(123);
+// or: final outcome = bobsFailure(Error());
+
+final message = outcome.resolve(
+    onFailure: (_) => 'Failed',
+    onSuccess: (value) => 'Success: $value',
+);
+
+print(message);
+```
+
+#### Resolve a `BobsOutcome`
+``` dart
+final outcome = bobsFailure(DatabaseException.notFound);
+
+final message = outcome.resolve(
+    onFailure: (exception) => switch(exception) {
+        DatabaseException.notFound => 'Not found',
+        DatabaseException.unknown => 'Unknown error',
+    },
+    onSuccess: (value) => 'Success: $value',
+);
+
+print(message); // Not found
+```
+
+#### Create a successful outcome
+``` dart
+final outcome = bobsSuccess(123);
+print(outcome.succeeded) // true
+```
+
+#### Create a failed outcome
+``` dart
+final outcome = bobsFailure(DatabaseException.notFound);
+print(outcome.succeeded) // false
+```
+
+#### Fetch the success
+``` dart
+final outcome = bobsSuccess('Hello World');
+print(outcome.asSuccess) // Hello World
+```
+
+#### Fetch the failure
+``` dart
+final outcome = bobsFailure(DatabaseException.notFound);
+print(outcome.asFailure) // DatabaseException.notFound
+```
+
+
 ### BobsNothing
 A `BobsNothing` represents... nothing. It's used for when a successful job doesn't return anything.
 
@@ -163,7 +219,7 @@ class Text {
   final String? text;
 
   Text copyWith({BobsMaybe<String>? text}) =>
-      Text(text: text?.asNullable ?? this.text);
+      Text(text: text != null ? text.asNullable : this.text);
 }
 
 var text = const Text(text: 'Hello World');
@@ -231,6 +287,18 @@ print(nullable) // null
 final maybeText = bobsPresent('Hello World');
 final maybeUppercaseText = maybeText.convert((text) => text.toUpperCase());
 ```
+
+
+### BigBob
+`BigBob` has a static function `onFailure` which is called whenever a `BobsJob` fails. This is great for logging.
+
+``` dart
+BigBob.onFailure = (failure, error, stack) => debugPrint('[$failure] $error');
+```
+
+
+### BobsStream (experimental)
+The idea of `BobsStream` is to catch the errors of a stream and return them through the stream as a `BobsOutcome`. The rest is similar to `BobsJob`. Detailed docs will follow once this is more stable.
 
 
 
