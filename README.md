@@ -363,11 +363,11 @@ BobsJobs provides straightforward helpers to mock and assert `BobsJob` outcomes 
 
 * **Mock a successful job:**
     ```dart
-    when(() => myMockedJob).thenReturn(bobsFakeSuccessJob(MySuccessValue));
+    when(myMockedJob).thenReturn(bobsFakeSuccessJob(MySuccessValue));
     ```
 * **Mock a failing job:**
     ```dart
-    when(() => myMockedJob).thenReturn(bobsFakeFailureJob(MyFailureValue));
+    when(myMockedJob).thenReturn(bobsFakeFailureJob(MyFailureValue));
     ```
 * **Expect a successful outcome:**
     ```dart
