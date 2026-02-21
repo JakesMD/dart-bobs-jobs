@@ -90,7 +90,7 @@ class BobsJob<F, S> {
   }) =>
       BobsJob(
         run: () async {
-          final result = await this.run();
+          final result = await run();
           return result.resolve(
             onFailure: (failure) => BobsFailure<F2, S2>(onFailure(failure)),
             onSuccess: (success) => BobsSuccess<F2, S2>(onSuccess(success)),
@@ -102,7 +102,7 @@ class BobsJob<F, S> {
   BobsJob<F, S2> thenConvertSuccess<S2>(S2 Function(S success) onSuccess) =>
       BobsJob(
         run: () async {
-          final result = await this.run();
+          final result = await run();
           return result.resolve(
             onFailure: BobsFailure<F, S2>.new,
             onSuccess: (success) => BobsSuccess<F, S2>(onSuccess(success)),
@@ -114,7 +114,7 @@ class BobsJob<F, S> {
   BobsJob<F2, S> thenConvertFailure<F2>(F2 Function(F failure) onFailure) =>
       BobsJob(
         run: () async {
-          final result = await this.run();
+          final result = await run();
           return result.resolve(
             onFailure: (failure) => BobsFailure<F2, S>(onFailure(failure)),
             onSuccess: BobsSuccess<F2, S>.new,
@@ -136,7 +136,7 @@ class BobsJob<F, S> {
   }) =>
       BobsJob(
         run: () async {
-          final result = await this.run();
+          final result = await run();
           return result.resolve(
             onFailure: BobsFailure<F, S>.new,
             onSuccess: (success) {
@@ -164,7 +164,7 @@ class BobsJob<F, S> {
   }) =>
       BobsJob(
         run: () async {
-          final result = await this.run();
+          final result = await run();
           return result.resolve(
             onSuccess: BobsSuccess<F, S>.new,
             onFailure: (failure) {
@@ -187,7 +187,7 @@ class BobsJob<F, S> {
   }) =>
       BobsJob(
         run: () async {
-          final result1 = await this.run();
+          final result1 = await run();
 
           if (result1.failed) {
             return BobsFailure<F2, S2>(onFailure(result1.asFailure));

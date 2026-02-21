@@ -1,11 +1,12 @@
+// Experimental
+// ignore_for_file: public_member_api_docs
+
 import 'dart:async';
 
 import 'package:bobs_jobs/bobs_jobs.dart';
 
 class BobsStream<F, S> {
   const BobsStream({required this.stream});
-
-  final Stream<BobsOutcome<F, S>> Function() stream;
 
   factory BobsStream.attempt({
     required Stream<S> stream,
@@ -24,6 +25,8 @@ class BobsStream<F, S> {
           }
         },
       );
+
+  final Stream<BobsOutcome<F, S>> Function() stream;
 
   BobsStream<F, S2> then<S2>({required FutureOr<S2> Function(S) run}) =>
       BobsStream(
